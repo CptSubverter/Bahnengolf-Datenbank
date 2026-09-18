@@ -1,0 +1,13 @@
+{
+  "version": "0.1.0",
+  "relations": [
+    "player_club",
+    "player_result",
+    "result_tournament",
+    "result_round",
+    "player_drl",
+    "player_dmv",
+    "club_association"
+  ],
+  "bidirectional_navigation": true
+}
