@@ -1,0 +1,12 @@
+{
+  "source_files_total": 76,
+  "source_files_parsed": 75,
+  "source_files_without_header": 1,
+  "rows": 210503,
+  "distinct_pass_numbers": 6361,
+  "matched_rows": 210503,
+  "unmatched_pass_numbers": 0,
+  "canonical_player_rows": 6438,
+  "pass_name_variant_groups": 193,
+  "status": "pass_reconciliation_successful_with_one_technical_source_exception"
+}
