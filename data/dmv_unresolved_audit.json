@@ -1,0 +1,8 @@
+{
+  "input_unresolved_rows": 23303,
+  "resolution_pass": "historical_name_variant_and_club_normalization",
+  "additional_resolved": 0,
+  "remaining_unresolved": 23303,
+  "note": "No additional identity links were created without sufficiently strong evidence. The remaining cases require broader source reconciliation rather than speculative matching.",
+  "status": "safe_hold"
+}
