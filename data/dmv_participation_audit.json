@@ -1,0 +1,13 @@
+{
+  "participation_rows": 156744,
+  "linked_to_result_exact_name_date": 769,
+  "linked_to_result_name_date_club": 0,
+  "linked_to_result_name_year_club": 77,
+  "linked_to_result_name_year": 61,
+  "ambiguous": 188,
+  "unresolved": 155649,
+  "total_linked": 907,
+  "legacy_pass_fields_ignored": true,
+  "matching_policy": "DMV participation has no trusted pass key in the new build; matching uses name, date/year and club, with result evidence.",
+  "status": "conservative_participation_to_result_linking_checkpoint"
+}
