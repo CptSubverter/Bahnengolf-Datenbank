@@ -1,0 +1,14 @@
+{
+  "version": "0.1.0",
+  "source": "DMV participation 2015-2025",
+  "legacy_identity_fields_ignored": true,
+  "fields": [
+    "dmv_entry_id",
+    "player_id",
+    "tournament_id",
+    "source_record_id",
+    "original_name",
+    "original_club",
+    "match_status"
+  ]
+}
