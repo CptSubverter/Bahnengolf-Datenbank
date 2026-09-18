@@ -1,0 +1,18 @@
+{
+  "version":"1.0.0",
+  "associations":[
+    {"association_id":"BBS","abbreviation":"BBS","canonical_name":"Badischer Bahnengolf-Sportverband"},
+    {"association_id":"BMV","abbreviation":"BMV","canonical_name":"Bayerischer Minigolfsport Verband"},
+    {"association_id":"BVBB","abbreviation":"BVBB","canonical_name":"Bahnengolf-Verband Berlin-Brandenburg"},
+    {"association_id":"BVSA","abbreviation":"BVSA","canonical_name":"Bahnengolf-Verband Sachsen-Anhalt"},
+    {"association_id":"BVS","abbreviation":"BVS","canonical_name":"Bahnengolf-Verband Sachsen"},
+    {"association_id":"HBSV","abbreviation":"HBSV","canonical_name":"Hessischer Bahnengolf-Sportverband"},
+    {"association_id":"HBV","abbreviation":"HBV","canonical_name":"Hamburger Bahnengolf Verband"},
+    {"association_id":"MRP","abbreviation":"MRP","canonical_name":"Minigolfsport-Verband Rheinland-Pfalz"},
+    {"association_id":"MVBN","abbreviation":"MVBN","canonical_name":"Minigolfsport-Verband Bremen/Niedersachsen"},
+    {"association_id":"NBV","abbreviation":"NBV","canonical_name":"Nordrhein-Westfälischer Bahnengolf-Verband"},
+    {"association_id":"SaarMV","abbreviation":"SaarMV","canonical_name":"Saarländischer Minigolfsportverband"},
+    {"association_id":"SHMV","abbreviation":"SHMV","canonical_name":"Schleswig-Holsteinischer Minigolfsport-Verband"},
+    {"association_id":"WBV","abbreviation":"WBV","canonical_name":"Württembergischer Bahnengolfsportverband"}
+  ]
+}
