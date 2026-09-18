@@ -1,0 +1,16 @@
+{
+  "version": "0.1.0",
+  "count": 210503,
+  "distinct_pass_numbers": 6361,
+  "fields": [
+    "drl_entry_id",
+    "player_id",
+    "list_date",
+    "rank",
+    "value",
+    "category",
+    "club_original",
+    "lv_original",
+    "source_record_id"
+  ]
+}
