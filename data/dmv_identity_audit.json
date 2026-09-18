@@ -1,0 +1,10 @@
+{
+  "result_rows": 52915,
+  "name_unique": 29243,
+  "name_plus_historical_club": 279,
+  "ambiguous": 90,
+  "unresolved": 23303,
+  "identity_rule": "No DMV pass number exists. Matching uses normalized name variants first, then historical DRL club evidence for ambiguous names.",
+  "unresolved_policy": "never auto-create or auto-link a player",
+  "status": "conservative_name_reconciliation_complete_for_current_candidate_base"
+}
