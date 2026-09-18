@@ -1,0 +1,24 @@
+{
+  "players": {
+    "rows": 6438,
+    "distinct_player_ids": 6438,
+    "duplicate_nonempty_pass_numbers": 0
+  },
+  "dmv_results": {
+    "rows": 52915,
+    "linked_player_rows": 29522,
+    "unresolved_rows": 23303,
+    "ambiguous_rows": 90,
+    "dangling_player_ids": 0,
+    "rows_without_tournament": 0,
+    "round_columns": 24,
+    "round_values": 135837,
+    "rounds_without_parent_result": 0
+  },
+  "release_blockers": [
+    "DMV unresolved/ambiguous identities still require retention as explicit audit states",
+    "DMV participation-to-result reconciliation is not yet fully materialized",
+    "canonical tournament/result/round files still need final publication"
+  ],
+  "status": "audit_pass_for_current_player_and_DMV_result_integrity; release_blocked_pending_full_relation_build"
+}
