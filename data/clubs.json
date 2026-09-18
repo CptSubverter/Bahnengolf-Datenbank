@@ -1,0 +1,12 @@
+{
+  "version": "0.1.0",
+  "count": 402,
+  "fields": [
+    "club_id",
+    "canonical_name",
+    "normalized_name",
+    "historical_names",
+    "association_ids",
+    "source_records"
+  ]
+}
