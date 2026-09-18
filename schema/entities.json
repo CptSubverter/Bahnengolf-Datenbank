@@ -1,0 +1,15 @@
+{
+  "version": "1.0.0",
+  "entities": [
+    "player",
+    "club",
+    "association",
+    "tournament",
+    "result",
+    "round",
+    "drl_entry",
+    "dmv_entry"
+  ],
+  "source_policy": "immutable_raw_source",
+  "relationship_policy": "reconciled_only"
+}
