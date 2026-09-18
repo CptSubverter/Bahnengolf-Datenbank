@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bahnengolf-Datenbank</title>
+<meta name="description" content="Interaktive Bahnengolf-Datenbank für Spieler, Vereine, Turniere, Ergebnisse, DRL und DMV.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="top">
+  <div class="wrap topin">
+    <div>
+      <div class="eyebrow">BAHNENGOLF-DATENBANK</div>
+      <h1>Spieler & Ergebnisse</h1>
+      <p>Verknüpfte Daten zu Spielern, Vereinen, Turnieren, Ergebnissen, DRL und DMV.</p>
+    </div>
+    <button id="themeBtn" class="iconbtn" title="Darstellung wechseln">☼</button>
+  </div>
+</header>
+<main class="wrap">
+  <section class="searchbox">
+    <div class="searchrow">
+      <input id="search" type="search" placeholder="Spieler, Verein, Turnier oder Passnummer suchen …" autocomplete="off">
+      <button id="clear" class="secondary">Zurücksetzen</button>
+    </div>
+    <div class="quick">
+      <button data-view="players">👤 Spieler</button>
+      <button data-view="clubs">🏆 Vereine</button>
+      <button data-view="tournaments">📅 Turniere</button>
+      <button data-view="results">📊 Ergebnisse</button>
+      <button data-view="drl">📈 DRL</button>
+      <button data-view="dmv">🇩🇪 DMV</button>
+    </div>
+  </section>
+
+  <section id="stats" class="stats"></section>
+
+  <section class="layout">
+    <aside class="panel nav">
+      <h2>Datenbank</h2>
+      <button class="navbtn active" data-view="players">Spieler</button>
+      <button class="navbtn" data-view="clubs">Vereine</button>
+      <button class="navbtn" data-view="tournaments">Turniere</button>
+      <button class="navbtn" data-view="results">Ergebnisse</button>
+      <button class="navbtn" data-view="drl">DRL-Listen</button>
+      <button class="navbtn" data-view="dmv">DMV-Daten</button>
+      <div class="note">Alle Verknüpfungen werden aus den geprüften Datenquellen aufgebaut. Unklare Identitäten bleiben sichtbar als offen.</div>
+    </aside>
+    <section class="panel content">
+      <div class="sectionhead"><div><span id="viewLabel">Spieler</span><h2 id="title">Spielerübersicht</h2></div><span id="count" class="pill"></span></div>
+      <div id="breadcrumbs" class="breadcrumbs"></div>
+      <div id="detail" class="detail"></div>
+      <div id="tablewrap"></div>
+    </section>
+  </section>
+</main>
+<footer><div class="wrap">Bahnengolf-Datenbank · Daten und Zuordnungen mit Quellenbezug</div></footer>
+<script src="app.js"></script>
+</body>
+</html>
