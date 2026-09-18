@@ -1,25 +1,23 @@
-# Reconciliation-Fortschritt
+# DMV-Ergebnisabgleich – Zwischenstand
 
-## DRL
+Der erste strukturelle Import umfasst 53.329 Zeilen aus den DMV-Ergebnisdateien 2015–2025.
 
-Das DRL-Archiv enthält 76 fachliche Listen. 75 Dateien wurden nach automatischer Erkennung der Kopfzeile strukturell erfolgreich eingelesen.
+Für den Identitätsabgleich wurde zusätzlich eine reihenfolgenunabhängige Namensnormalisierung geprüft, weil die Quellen unterschiedliche Schreibweisen wie „Nachname, Vorname“ und „Vorname Nachname“ verwenden.
 
-Auditierter Stand:
-- 210.503 DRL-Datenzeilen
-- 6.361 unterschiedliche Passnummern
-- 210.503 Zeilen per Passnummer genau einem Spieler-Kandidaten zugeordnet
-- 0 nicht zugeordnete Passnummern
-- 193 Passnummern mit historischen Namensvarianten
+Zwischenstand:
+- 29.116 Zeilen haben einen Namens-Treffer in der kanonischen Kandidatenbasis.
+- 28.757 davon haben genau einen Spieler-Kandidaten.
+- 359 Namensgruppen sind mehrdeutig.
+- 24.213 Zeilen haben keinen eindeutigen Namens-Treffer.
 
-Die 193 Namensvarianten bleiben als Quellenhistorie erhalten. Bei stabiler Passnummer werden sie nicht als verschiedene Personen behandelt. Die Passnummer bleibt der primäre Identitätsschlüssel.
+Wichtig: Ein fehlender Namens-Treffer wird nicht automatisch als neuer Spieler angelegt. Ebenso werden mehrdeutige Namen nicht automatisch verknüpft.
 
-Eine Datei (`rangliste83_2.xls`) ist technisch kein normal lesbares BIFF-Arbeitsbuch und bleibt deshalb bis zur Wiederherstellung einer validen Quelldarstellung ausgeschlossen. Es werden dafür keine Daten erfunden.
+Die 53.329 importierten Zeilen enthalten außerdem einzelne Vereins-/Teambezeichnungen, die im nächsten strukturellen Prüfschritt von echten Spielerzeilen getrennt werden müssen.
 
-## Nächste Schritte
+## Nächster Prüfschritt
 
-1. technische Ausnahme der DRL-Datei weiter prüfen
-2. Vereine und Landesverbände aus der DRL-Historie kanonisieren
-3. DMV-Ergebnisse 2015–2025 vollständig extrahieren
-4. DMV-Ergebnisse und Rundenergebnisse reconciliieren
-5. DMV-Teilnahmen reconciliieren
-6. Gesamt-Audit mit Fremdschlüsseln und Identitäten
+1. echte Spielerzeilen von Vereins-/Team-/Metadatenzeilen trennen
+2. eindeutige Namen mit Verein und Jahr gegen DRL-Historie prüfen
+3. mehrdeutige Namen als Auditfälle halten
+4. Rundenscores in einzelne Rundendatensätze zerlegen
+5. Turniere aus Datum + Bezeichnung + Ort stabil identifizieren
