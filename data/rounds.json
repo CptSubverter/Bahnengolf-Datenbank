@@ -1,0 +1,11 @@
+{
+  "version": "0.1.0",
+  "count": 135837,
+  "fields": [
+    "round_id",
+    "result_id",
+    "round_number",
+    "score",
+    "source_record_id"
+  ]
+}
