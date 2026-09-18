@@ -1,0 +1,27 @@
+{
+  "canonical_clubs": 402,
+  "historical_player_club_observations": 34195,
+  "observations_mapped_to_canonical_club": 34195,
+  "association_observations": {
+    "BBS": 2092,
+    "BMV": 5894,
+    "BVBB": 1136,
+    "BVSA": 608,
+    "BVS": 145,
+    "HBSV": 2617,
+    "HBV": 1001,
+    "MRP": 1787,
+    "MVBN": 4006,
+    "NBV": 11508,
+    "SaarMV": 705,
+    "SHMV": 1188,
+    "WBV": 1508
+  },
+  "clubs_with_multiple_observed_associations": 2,
+  "multi_association_cases": [
+    {"club_id":"club_165f23b2cafc","observed":["BVBB","HBV"],"status":"historical_source_conflict"},
+    {"club_id":"club_b41beb7384d6","observed":["MRP","NBV"],"status":"historical_source_conflict"}
+  ],
+  "policy": "Do not overwrite the canonical association with conflicting historical source evidence. Preserve each observation and require date/source evidence for a time-specific association.",
+  "status":"association_reconciliation_checkpoint"
+}
