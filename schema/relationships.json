@@ -1,0 +1,15 @@
+{
+  "version": "1.0.0",
+  "relationships": {
+    "player_club": "player.current_club_id -> club.club_id",
+    "club_association": "club.association_id -> association.association_id",
+    "result_player": "result.player_id -> player.player_id",
+    "result_tournament": "result.tournament_id -> tournament.tournament_id",
+    "round_result": "round.result_id -> result.result_id",
+    "drl_player": "drl_entry.player_id -> player.player_id",
+    "dmv_player": "dmv_entry.player_id -> player.player_id",
+    "drl_tournament": "drl_entry.tournament_id -> tournament.tournament_id (only when the source explicitly identifies it)",
+    "dmv_tournament": "dmv_entry.tournament_id -> tournament.tournament_id"
+  },
+  "integrity": "all foreign keys must resolve or remain null with an audit record"
+}
