@@ -1,0 +1,11 @@
+{
+  "dmv_result_rows": 52915,
+  "distinct_tournaments_by_year_date_name_place": 963,
+  "distinct_source_names": 9230,
+  "round_rows": 135837,
+  "round_columns": 24,
+  "round_policy": "one round record per non-empty round_n cell",
+  "identity_policy": "DMV has no pass number; reconciliation uses normalized name, historical club, year and ambiguity checks",
+  "team_and_metadata_names_detected": true,
+  "status": "round_extraction_ready_for_linking"
+}
