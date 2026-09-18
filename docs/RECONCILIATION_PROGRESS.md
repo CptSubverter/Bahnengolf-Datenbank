@@ -38,3 +38,22 @@ Damit wird die fehlende Passnummer der DMV-Quelle berücksichtigt, ohne falsche 
 ## Nächster Schritt
 
 Die noch 23.284 nicht eindeutig verbundenen Fälle werden jetzt nach Ursachen gruppiert: Vereins-/Metazeilen, Schreibvarianten, fehlende historische Spieler, Sonderzeichen/Encoding und echte ungeklärte Personen. Danach werden die DMV-Rundenergebnisse mit den bereits identifizierten Ergebnisdatensätzen verknüpft.
+
+
+# DMV-Teilnahmen – Importstatus
+
+Die DMV-Teilnahmedaten 2015–2025 werden als eigene Quellschicht behandelt. Sie enthalten keine Passnummer und dürfen deshalb nicht unabhängig vom Identitätsabgleich einem Spieler zugeordnet werden.
+
+Verknüpfungslogik:
+1. exakter normalisierter Name
+2. bei mehreren Kandidaten: Verein + Jahr + Turnier
+3. Abgleich gegen bereits reconciliierte DMV-Ergebnisse
+4. Abgleich gegen historische DRL-Vereins-/Namensdaten
+5. bei verbleibender Mehrdeutigkeit: offen
+
+Eine Teilnahme wird nicht als eigenständiger Beleg für eine Spieleridentität verwendet, wenn die Quelle keine ausreichende Identitätsinformation liefert. Resultatdaten bleiben die primäre Evidenz für die tatsächliche Turnierteilnahme.
+
+Zielmodell:
+Spieler ↔ DMV-Eintrag ↔ Turnier ↔ Ergebnis ↔ Runde
+
+Originalname und Originalverein werden in jedem DMV-Eintrag erhalten.
