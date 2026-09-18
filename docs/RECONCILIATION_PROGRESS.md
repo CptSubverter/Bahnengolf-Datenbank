@@ -1,30 +1,25 @@
 # Reconciliation-Fortschritt
 
-## DRL-Technik
+## DRL
 
-Das historische DRL-Archiv besteht aus 76 XLS-Dateien. Die Dateien können technisch zuverlässig über LibreOffice in XLSX konvertiert und anschließend gelesen werden. Alle 76 Dateien wurden erfolgreich konvertiert.
+Das DRL-Archiv enthält 76 fachliche Listen. 75 Dateien wurden nach automatischer Erkennung der Kopfzeile strukturell erfolgreich eingelesen.
 
-Die DRL-Tabelle enthält einen expliziten Pass-Schlüssel sowie Name, Kategorie, Verein und Landesverband. Damit ist die Passnummer der vorgesehene primäre Abgleichsschlüssel.
+Auditierter Stand:
+- 210.503 DRL-Datenzeilen
+- 6.361 unterschiedliche Passnummern
+- 210.503 Zeilen per Passnummer genau einem Spieler-Kandidaten zugeordnet
+- 0 nicht zugeordnete Passnummern
+- 193 Passnummern mit historischen Namensvarianten
 
-Ein Stichprobenlauf über 10 DRL-Dateien ergab 29.188 DRL-Zeilen mit 6.025 unterschiedlichen Passnummern. 63 dieser Passnummern waren in der bisherigen Spielerdaten-Ausgangsdatei nicht vorhanden. Diese 63 Fälle werden nicht automatisch einer Person zugeordnet; sie müssen als historische/externe Kandidaten behandelt und gegen weitere Quellen geprüft werden.
+Die 193 Namensvarianten bleiben als Quellenhistorie erhalten. Bei stabiler Passnummer werden sie nicht als verschiedene Personen behandelt. Die Passnummer bleibt der primäre Identitätsschlüssel.
 
-## Wichtige Konsequenz
+Eine Datei (`rangliste83_2.xls`) ist technisch kein normal lesbares BIFF-Arbeitsbuch und bleibt deshalb bis zur Wiederherstellung einer validen Quelldarstellung ausgeschlossen. Es werden dafür keine Daten erfunden.
 
-Die bisherige Spielerdaten-Datei ist nicht die endgültige Wahrheit. Sie enthält neben echten Personen auch passlose/sonstige Einträge aus historischen Quellen. Deshalb wird die neue kanonische Spielerbasis erst nach dem Quellvergleich freigegeben.
+## Nächste Schritte
 
-## DMV
-
-Das DMV-Ergebnisarchiv ist heterogen aufgebaut: Die Jahresdateien enthalten neben Ergebniszeilen auch Kopf-, Schiedsgerichts-, Ausschreibungs- und Metadatenzeilen. Die Ergebniszeilen müssen daher anhand ihrer Struktur extrahiert werden; die Excel-Zeile darf nicht pauschal als Spielerzeile interpretiert werden.
-
-Die Zeichenkodierung wird beim Import normalisiert, die Originalschreibweise bleibt erhalten.
-
-## Status
-
-- [x] DRL-Archiv technisch vollständig zugänglich
-- [x] Pass-Spalte im DRL identifiziert
-- [x] DRL-Stichprobenabgleich gestartet
-- [x] DMV-Dateistruktur geprüft
-- [ ] vollständiger DRL-Passabgleich
-- [ ] vollständiger DMV-Spielerabgleich
-- [ ] kanonische Spielerbasis freigeben
-- [ ] Gesamt-Audit
+1. technische Ausnahme der DRL-Datei weiter prüfen
+2. Vereine und Landesverbände aus der DRL-Historie kanonisieren
+3. DMV-Ergebnisse 2015–2025 vollständig extrahieren
+4. DMV-Ergebnisse und Rundenergebnisse reconciliieren
+5. DMV-Teilnahmen reconciliieren
+6. Gesamt-Audit mit Fremdschlüsseln und Identitäten
