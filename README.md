@@ -27,6 +27,21 @@ Relationale Bahnengolf-Datenbank für Spieler, Vereine, Verbände, Turniere, Erg
 
 Von 213.155 DRL-Zeilen sind derzeit 212.153 mit dem aktuellen Spielerbestand verknüpft. 1.002 historische Zeilen mit 101 unterschiedlichen Passnummern bleiben ausdrücklich ungeklärt und werden nicht künstlich Spielern zugeordnet.
 
+## Veröffentlichtes Kern-Datenmodell
+
+Die geprüften Stammdaten sind jetzt öffentlich im Repository vorhanden:
+
+- `data/players.csv`: **6.438 Spieler**
+- `data/clubs.csv`: **402 Vereine**
+- `data/associations.csv`: **13 Verbände**
+- Spieler → aktueller Verein → Verband ist für den veröffentlichten Stammdatensatz verknüpft.
+
+### Historische DRL-Nachverknüpfung
+
+Zusätzlich wurden **87 historische DRL-Zeilen aus 17 historischen Passnummern** über einen geprüften Override verknüpft. Grundlage ist ausschließlich ein **eindeutiger Namensabgleich plus identische DRL-Quelldatei in der Spielerhistorie**. Es werden keine Fuzzy-Matches oder reine Vereinsvermutungen verwendet.
+
+Damit bleiben im Laufzeit-Datenmodell **915 historische DRL-Zeilen aus 84 Passnummern** ausdrücklich ungeklärt. Die kanonischen DRL-Shards selbst bleiben unverändert und dokumentieren weiterhin 1.002 ursprünglich nicht verknüpfte Zeilen.
+
 ## Relationale Struktur
 
 - Spieler → aktueller Verein → Verband
