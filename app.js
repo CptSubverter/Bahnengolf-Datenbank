@@ -29,7 +29,7 @@ function relationSummary(){
     dmvPlayers:(DATA.dmv||[]).filter(d=>d.player_id&&findById("players",d.player_id)).length
   };
 }
-function cell(o,k){const v=val(o,k);if(!v)return"";const map={player_id:"players",club_id:"clubs",current_club_id:"clubs",association_id:"associations",current_association_id:"associations",tournament_id:"tournaments",result_id:"results"};const target=map[k];return target&&findById(target,v)?link(target,v,label(findById(target,v))):esc(v)}
+function cell(o,k){const v=val(o,k);if(!v)return"";const map={player_id:"players",club_id:"clubs",current_club_id:"clubs",association_id:"associations",current_association_id:"associations",tournament_id:"tournaments",result_id:"results",round_id:"rounds",drl_entry_id:"drl",dmv_entry_id:"dmv"};const target=map[k];return target&&findById(target,v)?link(target,v,label(findById(target,v))):esc(v)}
 function resultRows(p){return DATA.results.filter(r=>String(r.player_id||"")===String(p.player_id||"")||String(r.pass_number||"")===String(p.pass_number||""))}
 function roundRows(rs){const ids=new Set(rs.map(r=>String(r.result_id||"")).filter(Boolean));return DATA.rounds.filter(r=>ids.has(String(r.result_id||"")))}
 function tournamentHistory(p,rs){return[...new Map(rs.map(r=>{const id=r.tournament_id||"";return id?[id,{id,name:label(findById("tournaments",id)||r),date:val(findById("tournaments",id)||r,"date","tournament_date"),score:val(r,"total_score","score"),position:val(r,"position","place")}]:null}).filter(Boolean)).values()].sort((a,b)=>String(b.date).localeCompare(String(a.date)))}
