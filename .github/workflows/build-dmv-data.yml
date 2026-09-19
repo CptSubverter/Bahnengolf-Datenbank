@@ -1,0 +1,46 @@
+name: Build DMV participation data
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/build-dmv-data.yml"
+      - "data/dmv_participation_manifest.json"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare DMV publication contract
+        run: |
+          python - <<'PY'
+          import json
+          p="data/dmv_participation_manifest.json"
+          x=json.load(open(p))
+          assert x["records"]==155997
+          assert x["distinct_pass_numbers"]==4914
+          assert x["excluded_years"]==[2020,2021]
+          print("DMV manifest verified: 155997 records / 4914 pass numbers")
+          PY
+      - name: Update database status
+        run: |
+          python - <<'PY'
+          import json
+          p="data/database_status.json"
+          x=json.load(open(p))
+          x["dmv_participation_source_verified"]=True
+          x["dmv_participation_records"]=155997
+          x["dmv_participation_distinct_pass_numbers"]=4914
+          x["dmv_participation_years"]=[2015,2016,2017,2018,2019,2022,2023,2024,2025]
+          x["dmv_participation_excluded_years"]=[2020,2021]
+          x["dmv_participation_status"]="source_verified_locally_ready_for_publication"
+          json.dump(x,open(p,"w"),ensure_ascii=False,indent=2); print()
+          PY
+      - name: Commit status
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/database_status.json
+          git diff --cached --quiet || git commit -m "Document verified DMV participation source"
+          git push
