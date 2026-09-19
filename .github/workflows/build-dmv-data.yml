@@ -34,7 +34,7 @@ jobs:
                   for r in csv.DictReader(f):
                       rows+=1
                       if r.get("pass_number"):
-                          passes.add(r["pass_number"].strip().rstrip(".0"))
+                          passes.add(r["pass_number"].strip().split(".")[0] if r["pass_number"].strip().endswith(".0") else r["pass_number"].strip())
           assert rows==156744, f"Expected 156744 rows, got {rows}"
           assert len(passes)==4913, f"Expected 4913 pass source keys, got {len(passes)}"
           print(f"Verified DMV package: {rows} rows, {len(passes)} distinct pass source keys")
