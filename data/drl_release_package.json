@@ -1,5 +1,5 @@
 {
-  "status": "canonical_transfer_package_ready",
+  "status": "canonical_drl_shards_published",
   "repository": "CptSubverter/Bahnengolf-Datenbank",
   "branch": "main",
   "source_files_total": 76,
@@ -61,5 +61,6 @@
       "sha256": "e64745794a58595c9d061000b066362f36b8b8883777ac8c9bfec31a53b6b545"
     }
   ],
-  "release_source": "release/DRL_CANONICAL_SHARDS_213155.zip"
+  "release_source": "DRL_CANONICAL_SHARDS_213155.zip",
+  "public_location": "data/drl_entries_01.json ... data/drl_entries_08.json"
 }
