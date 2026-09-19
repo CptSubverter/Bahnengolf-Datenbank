@@ -9,16 +9,57 @@
   "included_correction": "rangliste79.xls",
   "total_records": 213155,
   "distinct_pass_numbers": 6539,
-  "public_drl_shards": false,
+  "public_drl_shards": true,
   "package": "DRL_CANONICAL_SHARDS_213155.zip",
   "shards": [
-    {"file":"drl_entries_01.json","bytes":10581630,"records":26645,"sha256":"44c45c2b0551a71e575b551c8007bc06a2b62ac15a674c63b59334d81d373775"},
-    {"file":"drl_entries_02.json","bytes":10431252,"records":26645,"sha256":"7621f7d549f89690dfa7ea8c28bead808c4336398b3cbe88d55add77a3d0a92c"},
-    {"file":"drl_entries_03.json","bytes":10258069,"records":26645,"sha256":"6b278cef0fc8cc2a9c7379894aadff909d6f33260c14ea53d3683dd8fddf32e3"},
-    {"file":"drl_entries_04.json","bytes":10177735,"records":26645,"sha256":"ec053da62d6ed4d594a6c92d737d98cce8592472987a8ca03be62ca93b473479"},
-    {"file":"drl_entries_05.json","bytes":10219404,"records":26645,"sha256":"ee8b724340f5dfb2effc2c99725d267d2c2208f28ba9eae03a9ce120723f6732"},
-    {"file":"drl_entries_06.json","bytes":10229153,"records":26645,"sha256":"8f687bc1b60a9724f3b7ca26ff3453c7b05703f708190c351b3883013e15de43"},
-    {"file":"drl_entries_07.json","bytes":10425868,"records":26645,"sha256":"3b632a62425e15c3dc7b59df20b8e971c74dddf2da6fde0dcbc29bbfb25812da"},
-    {"file":"drl_entries_08.json","bytes":10227850,"records":26640,"sha256":"e64745794a58595c9d061000b066362f36b8b8883777ac8c9bfec31a53b6b545"}
-  ]
+    {
+      "file": "drl_entries_01.json",
+      "bytes": 10581630,
+      "records": 26645,
+      "sha256": "44c45c2b0551a71e575b551c8007bc06a2b62ac15a674c63b59334d81d373775"
+    },
+    {
+      "file": "drl_entries_02.json",
+      "bytes": 10431252,
+      "records": 26645,
+      "sha256": "7621f7d549f89690dfa7ea8c28bead808c4336398b3cbe88d55add77a3d0a92c"
+    },
+    {
+      "file": "drl_entries_03.json",
+      "bytes": 10258069,
+      "records": 26645,
+      "sha256": "6b278cef0fc8cc2a9c7379894aadff909d6f33260c14ea53d3683dd8fddf32e3"
+    },
+    {
+      "file": "drl_entries_04.json",
+      "bytes": 10177735,
+      "records": 26645,
+      "sha256": "ec053da62d6ed4d594a6c92d737d98cce8592472987a8ca03be62ca93b473479"
+    },
+    {
+      "file": "drl_entries_05.json",
+      "bytes": 10219404,
+      "records": 26645,
+      "sha256": "ee8b724340f5dfb2effc2c99725d267d2c2208f28ba9eae03a9ce120723f6732"
+    },
+    {
+      "file": "drl_entries_06.json",
+      "bytes": 10229153,
+      "records": 26645,
+      "sha256": "8f687bc1b60a9724f3b7ca26ff3453c7b05703f708190c351b3883013e15de43"
+    },
+    {
+      "file": "drl_entries_07.json",
+      "bytes": 10425868,
+      "records": 26645,
+      "sha256": "3b632a62425e15c3dc7b59df20b8e971c74dddf2da6fde0dcbc29bbfb25812da"
+    },
+    {
+      "file": "drl_entries_08.json",
+      "bytes": 10227850,
+      "records": 26640,
+      "sha256": "e64745794a58595c9d061000b066362f36b8b8883777ac8c9bfec31a53b6b545"
+    }
+  ],
+  "release_source": "release/DRL_CANONICAL_SHARDS_213155.zip"
 }
