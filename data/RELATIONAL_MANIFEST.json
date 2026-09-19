@@ -19,24 +19,28 @@
     "results.player_id -> players.player_id",
     "results.tournament_id -> tournaments.tournament_id",
     "rounds.result_id -> results.result_id",
-    "drl_entries.player_id -> players.player_id"
+    "drl_entries.player_id -> players.player_id (when pass exists in canonical player table)"
   ],
+  "drl_reconciliation": {
+    "rows": 213155,
+    "distinct_pass_numbers": 6539,
+    "linked_rows": 212153,
+    "unresolved_rows": 1002,
+    "unresolved_distinct_pass_numbers": 101,
+    "valid_snapshot_added": "rangliste79.xls",
+    "malformed_snapshot_excluded": "rangliste83_2.xls"
+  },
   "dmv_identity": {
     "pass_number": false,
     "primary": "normalized_exact_name",
-    "secondary": [
-      "club",
-      "year",
-      "tournament",
-      "location",
-      "historical_drl"
-    ],
+    "secondary": ["club","year","tournament","location","historical_drl"],
     "same_exact_name_allowed": true,
     "ambiguous_remains_unlinked": true
   },
   "release_blockers": [
-    "one valid DRL snapshot (rangliste79.xls) must be included in the next canonical shard rebuild",
-    "one valid DRL snapshot (rangliste79.xls) must be included in the next canonical shard rebuild",
-    "one malformed DRL source file (rangliste83_2.xls) remains excluded pending recovery"
+    "canonical DRL shards still need public repository publication",
+    "1002 historical DRL rows currently lack a link to the current 6438-player canonical table and must remain explicitly unresolved",
+    "one malformed DRL source file (rangliste83_2.xls) remains excluded pending recovery",
+    "DMV participation/result relations are not yet fully materialized"
   ]
 }
