@@ -3,9 +3,9 @@
   "players": 6438,
   "clubs": 402,
   "associations": 13,
-  "tournaments": 963,
-  "results": 52915,
-  "rounds": 135837,
+  "tournaments": 1,
+  "results": 27501,
+  "rounds": 114777,
   "drl_rows": 213155,
   "drl_distinct_pass_numbers": 6539,
   "drl_linked_rows": 212153,
@@ -27,5 +27,9 @@
   "runtime_drl_rows_resolved_by_reviewed_overrides": 87,
   "runtime_drl_distinct_pass_numbers_resolved": 17,
   "runtime_drl_remaining_unresolved_rows": 915,
-  "runtime_drl_remaining_unresolved_distinct_pass_numbers": 84
+  "runtime_drl_remaining_unresolved_distinct_pass_numbers": 84,
+  "results_source": "Spielerdatenbank/rounds-01.json … rounds-04.json",
+  "results_source_records": 27501,
+  "results_source_rounds": 114777,
+  "results_identity_rule": "Passnummer direkt verknüpft; Name/Club-Fälle bleiben als Prüfstatus erhalten."
 }
