@@ -15,10 +15,27 @@
     "round_values": 135837,
     "rounds_without_parent_result": 0
   },
+  "drl": {
+    "source_files_total": 76,
+    "source_files_parsed": 75,
+    "source_files_excluded": 1,
+    "rows": 213155,
+    "distinct_pass_numbers": 6539,
+    "linked_to_current_players": 212153,
+    "unresolved_historical_rows": 1002,
+    "unresolved_distinct_pass_numbers": 101,
+    "excluded_source_file": "rangliste83_2.xls",
+    "excluded_reason": "Source page is not readable; file is therefore completely ignored and contributes no canonical DRL data.",
+    "included_correction": "rangliste79.xls",
+    "included_correction_rows": 2652
+  },
   "release_blockers": [
     "DMV unresolved/ambiguous identities still require retention as explicit audit states",
     "DMV participation-to-result reconciliation is not yet fully materialized",
-    "canonical tournament/result/round files still need final publication"
+    "canonical tournament/result/round files still need final publication",
+    "canonical DRL shards still need public repository publication",
+    "1002 historical DRL rows currently lack a link to the current 6438-player canonical table and must remain explicitly unresolved",
+    "rangliste83_2.xls is intentionally and permanently excluded because the source page is not readable"
   ],
-  "status": "audit_pass_for_current_player_and_DMV_result_integrity; release_blocked_pending_full_relation_build"
+  "status": "audit_pass_for_current_player_and_DMV_result_integrity; DRL_source_recheck_successful; release_blocked_pending_full_relation_build"
 }
