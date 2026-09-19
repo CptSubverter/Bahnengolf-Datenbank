@@ -1,0 +1,68 @@
+name: Publish canonical DRL shards
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "release/DRL_CANONICAL_SHARDS_213155.zip"
+
+permissions:
+  contents: write
+
+jobs:
+  publish-drl:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Extract and validate canonical DRL shards
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f release/DRL_CANONICAL_SHARDS_213155.zip
+          rm -rf /tmp/drl_release
+          mkdir -p /tmp/drl_release
+          unzip -q release/DRL_CANONICAL_SHARDS_213155.zip -d /tmp/drl_release
+
+          for i in 01 02 03 04 05 06 07 08; do
+            test -f "/tmp/drl_release/drl_entries_${i}.json"
+          done
+
+          python3 - <<'PY'
+          import json, pathlib, sys
+          root=pathlib.Path("/tmp/drl_release")
+          total=0
+          for i in range(1,9):
+              p=root/f"drl_entries_{i:02d}.json"
+              data=json.loads(p.read_text(encoding="utf-8"))
+              if not isinstance(data,list):
+                  raise SystemExit(f"{p} is not a JSON array")
+              print(p.name, len(data))
+              total += len(data)
+          if total != 213155:
+              raise SystemExit(f"Expected 213155 records, got {total}")
+          PY
+
+      - name: Publish shards
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp /tmp/drl_release/drl_entries_*.json data/
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path("data/drl_release_package.json")
+          d=json.loads(p.read_text(encoding="utf-8"))
+          d["public_drl_shards"]=True
+          d["release_source"]="release/DRL_CANONICAL_SHARDS_213155.zip"
+          p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+          PY
+
+      - name: Commit published shards
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/drl_entries_*.json data/drl_release_package.json
+          git diff --cached --quiet || git commit -m "Publish canonical DRL shards"
+          git push
