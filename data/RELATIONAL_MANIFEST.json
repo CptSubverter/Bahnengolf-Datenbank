@@ -1,17 +1,17 @@
 {
-  "version":"0.1.0-release-candidate",
-  "status":"build_complete_local_audit_pending_public_data_sync",
-  "entities":{
-    "players":6438,
-    "clubs":402,
-    "associations":13,
-    "tournaments":963,
-    "results":52915,
-    "rounds":135837,
-    "drl_entries":210503,
-    "historical_player_clubs":34195
+  "version": "0.1.0-release-candidate",
+  "status": "build_complete_local_audit_pending_public_data_sync",
+  "entities": {
+    "players": 6438,
+    "clubs": 402,
+    "associations": 13,
+    "tournaments": 963,
+    "results": 52915,
+    "rounds": 135837,
+    "drl_entries": 213155,
+    "historical_player_clubs": 34195
   },
-  "relations":[
+  "relations": [
     "players.current_club_id -> clubs.club_id",
     "players.current_association_id -> associations.association_id",
     "historical_player_clubs.player_id -> players.player_id",
@@ -21,16 +21,22 @@
     "rounds.result_id -> results.result_id",
     "drl_entries.player_id -> players.player_id"
   ],
-  "dmv_identity":{
-    "pass_number":false,
-    "primary":"normalized_exact_name",
-    "secondary":["club","year","tournament","location","historical_drl"],
-    "same_exact_name_allowed":true,
-    "ambiguous_remains_unlinked":true
+  "dmv_identity": {
+    "pass_number": false,
+    "primary": "normalized_exact_name",
+    "secondary": [
+      "club",
+      "year",
+      "tournament",
+      "location",
+      "historical_drl"
+    ],
+    "same_exact_name_allowed": true,
+    "ambiguous_remains_unlinked": true
   },
-  "release_blockers":[
-    "DMV participation relation not yet fully materialized",
-    "23,393 DMV result rows currently lack a unique player link (90 explicitly ambiguous)",
-    "one malformed DRL source file remains excluded pending recovery"
+  "release_blockers": [
+    "one valid DRL snapshot (rangliste79.xls) must be included in the next canonical shard rebuild",
+    "one valid DRL snapshot (rangliste79.xls) must be included in the next canonical shard rebuild",
+    "one malformed DRL source file (rangliste83_2.xls) remains excluded pending recovery"
   ]
 }
