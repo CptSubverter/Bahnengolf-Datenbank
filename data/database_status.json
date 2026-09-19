@@ -1,0 +1,19 @@
+{
+  "status": "release_candidate",
+  "players": 6438,
+  "clubs": 402,
+  "associations": 13,
+  "tournaments": 963,
+  "results": 52915,
+  "rounds": 135837,
+  "drl_rows": 213155,
+  "drl_distinct_pass_numbers": 6539,
+  "drl_linked_rows": 212153,
+  "drl_unresolved_rows": 1002,
+  "drl_source_files_parsed": 75,
+  "drl_source_files_total": 76,
+  "drl_excluded_source": "rangliste83_2.xls",
+  "drl_excluded_reason": "Original source page is not readable; completely ignored.",
+  "drl_correction": "rangliste79.xls included (+2652 rows)",
+  "public_drl_shards": false
+}
