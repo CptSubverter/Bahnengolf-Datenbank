@@ -1,0 +1,16 @@
+{
+  "source_archive": "Archiv(5).zip",
+  "checked_at": "2026-09-19",
+  "source_files_total": 76,
+  "files_with_standard_drl_header": 75,
+  "technical_exception": "rangliste83_2.xls",
+  "raw_drl_rows_standard_files": 213155,
+  "distinct_pass_numbers_standard_files": 6539,
+  "previous_canonical_rows": 210503,
+  "previous_canonical_pass_numbers": 6361,
+  "newly_confirmed_source_file": "rangliste79.xls",
+  "new_rows_vs_previous_canonical": 2652,
+  "new_pass_numbers_vs_previous_canonical": 178,
+  "decision": "rangliste79 is a valid DRL snapshot and must no longer be excluded; rangliste83_2 remains excluded until its malformed source representation is recovered",
+  "publication_status": "pending canonical shard rebuild"
+}
