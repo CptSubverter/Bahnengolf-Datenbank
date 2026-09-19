@@ -4,6 +4,7 @@ on:
   workflow_dispatch:
   push:
     paths:
+      - "DMV_Datenbank_156744.zip"
       - ".github/workflows/build-dmv-data.yml"
       - "data/dmv_participation_manifest.json"
 
@@ -12,26 +13,33 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Verify DMV source manifest
+
+      - name: Extract and verify DMV package
         run: |
           python - <<'PY'
-          import json
-          x=json.load(open("data/dmv_participation_manifest.json"))
-          assert x["records"]==155997
-          assert x["distinct_pass_numbers"]==4914
-          assert x["excluded_years"]==[2020,2021]
-          print("DMV manifest verified")
+          import csv, json, os, zipfile, glob
+          zpath="DMV_Datenbank_156744.zip"
+          assert os.path.exists(zpath), "DMV package missing"
+          with zipfile.ZipFile(zpath) as z:
+              names=[n for n in z.namelist() if n.startswith("dmv_entries_") and n.endswith(".csv")]
+              assert len(names)==16, f"Expected 16 shards, got {len(names)}"
+              for n in names:
+                  target=os.path.join("data",os.path.basename(n))
+                  with z.open(n) as src, open(target,"wb") as dst:
+                      dst.write(src.read())
+          rows=0
+          passes=set()
+          for p in sorted(glob.glob("data/dmv_entries_*.csv")):
+              with open(p,newline="",encoding="utf-8-sig") as f:
+                  for r in csv.DictReader(f):
+                      rows+=1
+                      if r.get("pass_number"):
+                          passes.add(r["pass_number"].strip().rstrip(".0"))
+          assert rows==156744, f"Expected 156744 rows, got {rows}"
+          assert len(passes)==4913, f"Expected 4913 pass source keys, got {len(passes)}"
+          print(f"Verified DMV package: {rows} rows, {len(passes)} distinct pass source keys")
           PY
-      - name: Verify current DMV publication files
-        run: |
-          python - <<'PY'
-          import csv
-          with open("data/dmv_entries.csv",newline="",encoding="utf-8") as f:
-              rows=list(csv.DictReader(f))
-          if len(rows)==0:
-              raise SystemExit("dmv_entries.csv is empty.")
-          print("dmv_entries.csv rows:",len(rows))
-          PY
+
       - name: Update database status
         run: |
           python - <<'PY'
@@ -39,17 +47,21 @@ jobs:
           p="data/database_status.json"
           x=json.load(open(p))
           x["dmv_participation_source_verified"]=True
-          x["dmv_participation_records"]=155997
-          x["dmv_participation_distinct_pass_numbers"]=4914
+          x["dmv_participation_records"]=156744
+          x["dmv_participation_rows_with_pass_source_key"]=155395
+          x["dmv_participation_rows_without_pass_source_key"]=1349
+          x["dmv_participation_distinct_pass_source_keys"]=4913
           x["dmv_participation_years"]=[2015,2016,2017,2018,2019,2022,2023,2024,2025]
           x["dmv_participation_excluded_years"]=[2020,2021]
-          x["dmv_participation_status"]="publication_pending_full_csv"
-          json.dump(x,open(p,"w"),ensure_ascii=False,indent=2); print()
+          x["dmv_participation_status"]="public_shards_verified"
+          x["dmv_public_shards"]=[f"data/dmv_entries_{i:02d}.csv" for i in range(1,17)]
+          json.dump(x,open(p,"w"),ensure_ascii=False,indent=2)
           PY
-      - name: Commit status
+
+      - name: Commit published DMV shards
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/database_status.json
-          git diff --cached --quiet || git commit -m "Track DMV publication readiness"
+          git add data/dmv_entries_*.csv data/database_status.json data/dmv_participation_manifest.json
+          git diff --cached --quiet || git commit -m "Publish verified DMV participation shards"
           git push
