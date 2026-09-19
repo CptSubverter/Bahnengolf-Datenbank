@@ -18,6 +18,17 @@ function setView(v){state.view=v;state.detail=null;state.q="";$("#search").value
 function openItem(v,k){state.view=v;state.detail=k;state.q="";$("#search").value="";render()}
 function related(view,obj){const keys={players:["player_id","pass_number"],clubs:["club_id"],associations:["association_id"],tournaments:["tournament_id"],results:["result_id","player_id","tournament_id"],rounds:["round_id","result_id","player_id"],drl:["drl_entry_id","player_id","pass_number"],dmv:["dmv_entry_id","player_id","pass_number"]};const source=keys[state.view]||[];const target=keys[view]||[];return(DATA[view]||[]).filter(x=>source.some(k=>obj?.[k]!==undefined&&obj[k]!==""&&target.some(t=>String(x?.[t]??"")===String(obj[k]))))}
 function renderStats(){const defs=[["players","Spieler"],["clubs","Vereine"],["associations","Verbände"],["tournaments","Turniere"],["results","Ergebnisse"],["rounds","Runden"],["drl","DRL"],["dmv","DMV"]];$("#stats").innerHTML=defs.map(([k,l])=>'<button class="stat" onclick="setView(\''+k+'\')"><b>'+DATA[k].length.toLocaleString("de-DE")+'</b><span>'+l+"</span></button>").join("")}
+function relationSummary(){
+  return {
+    playersClubs:DATA.players.filter(p=>p.current_club_id&&findById("clubs",p.current_club_id)).length,
+    playersAssociations:DATA.players.filter(p=>p.current_association_id&&findById("associations",p.current_association_id)).length,
+    resultPlayers:DATA.results.filter(r=>r.player_id&&findById("players",r.player_id)).length,
+    resultTournaments:DATA.results.filter(r=>r.tournament_id&&findById("tournaments",r.tournament_id)).length,
+    roundsResults:DATA.rounds.filter(r=>r.result_id&&findById("results",r.result_id)).length,
+    drlPlayers:DATA.drl.filter(d=>d.player_id&&findById("players",d.player_id)).length,
+    dmvPlayers:(DATA.dmv||[]).filter(d=>d.player_id&&findById("players",d.player_id)).length
+  };
+}
 function cell(o,k){const v=val(o,k);if(!v)return"";const map={player_id:"players",club_id:"clubs",current_club_id:"clubs",association_id:"associations",current_association_id:"associations",tournament_id:"tournaments",result_id:"results"};const target=map[k];return target&&findById(target,v)?link(target,v,label(findById(target,v))):esc(v)}
 function resultRows(p){return DATA.results.filter(r=>String(r.player_id||"")===String(p.player_id||"")||String(r.pass_number||"")===String(p.pass_number||""))}
 function roundRows(rs){const ids=new Set(rs.map(r=>String(r.result_id||"")).filter(Boolean));return DATA.rounds.filter(r=>ids.has(String(r.result_id||"")))}
