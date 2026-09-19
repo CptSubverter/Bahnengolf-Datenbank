@@ -1,0 +1,116 @@
+name: Build canonical tournament results
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/build-results-data.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build tournaments, results and rounds
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import csv, json, urllib.request, hashlib, re
+          from pathlib import Path
+
+          BASE="https://raw.githubusercontent.com/CptSubverter/Spielerdatenbank/main/data"
+          rows=[]
+          for i in range(1,5):
+              with urllib.request.urlopen(f"{BASE}/rounds-{i:02d}.json") as f:
+                  rows.extend(json.load(f))
+
+          out=Path("data"); out.mkdir(exist_ok=True)
+
+          players={}
+          with (out/"players.csv").open(encoding="utf-8") as f:
+              for p in csv.DictReader(f):
+                  players[p["pass_number"]]=p["player_id"]
+
+          clubs={}
+          with (out/"clubs.csv").open(encoding="utf-8") as f:
+              for c in csv.DictReader(f):
+                  clubs[c["normalized_name"]]=c["club_id"]
+
+          def norm(s):
+              s=str(s or "").casefold().strip()
+              s=re.sub(r"\b(e\.v\.|e\.v)\b","",s)
+              s=re.sub(r"\s+(?:i{1,5}|[1-5])$","",s)
+              return re.sub(r"\s+"," ",s).strip()
+
+          def result_id(r):
+              return hashlib.sha1("|".join(map(str,[
+                  r.get("code",""),r.get("place",""),r.get("player_key",""),
+                  r.get("total",""),r.get("player_name","")
+              ])).encode("utf-8")).hexdigest()[:20]
+
+          tournaments={}
+          for r in rows:
+              tournaments.setdefault(r["code"],(r.get("date",""),r.get("tournament",""),r.get("location","")))
+
+          with (out/"tournaments.csv").open("w",encoding="utf-8",newline="") as f:
+              w=csv.writer(f); w.writerow(["tournament_id","date","tournament_name","location","source_code"])
+              for code,(date,name,location) in sorted(tournaments.items()):
+                  w.writerow([code,date,name,location,code])
+
+          with (out/"results.csv").open("w",encoding="utf-8",newline="") as f:
+              w=csv.writer(f)
+              w.writerow(["result_id","player_id","tournament_id","club_id","place","total_score","average","identity_status","source"])
+              for r in rows:
+                  pid=players.get(str(r.get("player_pass","")),"")
+                  cid=clubs.get(norm(r.get("result_club","")),"")
+                  status="pass_verified" if pid else ("name_plus_club_review" if r.get("match_method")=="name+club" else "unresolved_identity")
+                  w.writerow([result_id(r),pid,r["code"],cid,r.get("place",""),r.get("total",""),r.get("average",""),status,r.get("source","")])
+
+          with (out/"rounds.csv").open("w",encoding="utf-8",newline="") as f:
+              w=csv.writer(f)
+              w.writerow(["round_id","result_id","player_id","tournament_id","round_no","score","identity_status","source"])
+              for r in rows:
+                  pid=players.get(str(r.get("player_pass","")),"")
+                  rid=result_id(r)
+                  status="pass_verified" if pid else ("name_plus_club_review" if r.get("match_method")=="name+club" else "unresolved_identity")
+                  for no,score in enumerate(r.get("rounds") or [],1):
+                      w.writerow([f"{rid}-{no}",rid,pid,r["code"],no,score,status,r.get("source","")])
+
+          print(f"source_records={len(rows)}")
+          print(f"tournaments={len(tournaments)}")
+          print(f"results={len(rows)}")
+          print(f"rounds={sum(len(r.get('rounds') or []) for r in rows)}")
+          PY
+
+      - name: Update database status
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import csv,json
+          from pathlib import Path
+          p=Path("data/database_status.json")
+          x=json.loads(p.read_text(encoding="utf-8"))
+          x.update({
+            "tournaments": sum(1 for _ in csv.DictReader(open("data/tournaments.csv",encoding="utf-8"))),
+            "results": sum(1 for _ in csv.DictReader(open("data/results.csv",encoding="utf-8"))),
+            "rounds": sum(1 for _ in csv.DictReader(open("data/rounds.csv",encoding="utf-8"))),
+            "results_source": "Spielerdatenbank/rounds-01.json … rounds-04.json",
+            "results_source_records": 27501,
+            "results_source_rounds": 114777,
+            "results_identity_rule": "Passnummer direkt verknüpft; Name/Club-Fälle bleiben als Prüfstatus erhalten."
+          })
+          p.write_text(json.dumps(x,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+          PY
+
+      - name: Commit canonical tournament data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/tournaments.csv data/results.csv data/rounds.csv data/database_status.json
+          git diff --cached --quiet && exit 0
+          git commit -m "Publish canonical tournament results and rounds"
+          git push
