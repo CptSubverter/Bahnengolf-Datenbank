@@ -9,5 +9,25 @@
   "total_linked": 907,
   "legacy_pass_fields_ignored": true,
   "matching_policy": "DMV participation has no trusted pass key in the new build; matching uses name, date/year and club, with result evidence.",
-  "status": "conservative_participation_to_result_linking_checkpoint"
+  "status": "conservative_participation_to_result_linking_checkpoint",
+  "source_recheck_2026_09_19": {
+    "archive": "DMV_Teilnahmen_2015_2025_VOLLSTAENDIG.zip",
+    "years": [
+      2015,
+      2016,
+      2017,
+      2018,
+      2019,
+      2022,
+      2023,
+      2024,
+      2025
+    ],
+    "rows": 156744,
+    "rows_with_pass_source_key": 155395,
+    "rows_without_pass_source_key": 1349,
+    "distinct_pass_source_keys": 4913,
+    "distinct_tournament_codes": 6053,
+    "pass_source_key_is_not_yet_canonical_player_id": true
+  }
 }
