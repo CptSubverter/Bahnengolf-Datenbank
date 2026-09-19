@@ -2,19 +2,10 @@
   "source": "DMV_Teilnahmen_2015_2025_VOLLSTAENDIG.zip",
   "years": [2015,2016,2017,2018,2019,2022,2023,2024,2025],
   "excluded_years": [2020,2021],
-  "records": 155997,
-  "distinct_pass_numbers": 4914,
-  "annual_check": [
-    {"year":2015,"records":19519,"with_rounds":836,"without_rounds":18683},
-    {"year":2016,"records":17783,"with_rounds":1643,"without_rounds":16140},
-    {"year":2017,"records":18262,"with_rounds":1833,"without_rounds":16429},
-    {"year":2018,"records":18135,"with_rounds":1683,"without_rounds":16452},
-    {"year":2019,"records":17631,"with_rounds":2617,"without_rounds":15014},
-    {"year":2022,"records":14125,"with_rounds":3138,"without_rounds":10987},
-    {"year":2023,"records":16608,"with_rounds":4876,"without_rounds":11732},
-    {"year":2024,"records":17079,"with_rounds":5322,"without_rounds":11757},
-    {"year":2025,"records":17602,"with_rounds":5553,"without_rounds":12049}
-  ],
-  "identity_rule": "Passnummern werden direkt mit dem kanonischen Spielerbestand verknüpft. Fehlende oder nicht eindeutige Identitäten werden nicht künstlich ergänzt.",
-  "status": "source_verified_locally_ready_for_publication"
+  "records": 156744,
+  "rows_with_pass_source_key": 155395,
+  "rows_without_pass_source_key": 1349,
+  "distinct_pass_source_keys": 4913,
+  "identity_rule": "Passnummern werden nur als Quellschlüssel dokumentiert. Sie werden nicht ungeprüft als kanonische player_id verwendet; fehlende oder nicht eindeutige Identitäten werden nicht künstlich ergänzt.",
+  "status": "source_reconciled_and_ready_for_automated_publication"
 }
