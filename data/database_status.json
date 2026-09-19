@@ -1,5 +1,5 @@
 {
-  "status": "release_candidate",
+  "status": "drl_published",
   "players": 6438,
   "clubs": 402,
   "associations": 13,
@@ -15,5 +15,6 @@
   "drl_excluded_source": "rangliste83_2.xls",
   "drl_excluded_reason": "Original source page is not readable; completely ignored.",
   "drl_correction": "rangliste79.xls included (+2652 rows)",
-  "public_drl_shards": false
+  "public_drl_shards": true,
+  "drl_publication_verified": true
 }
