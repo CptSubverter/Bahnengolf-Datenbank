@@ -88,15 +88,15 @@ function renderDetail(){const o=findById(state.view,state.detail);if(!o){$("#det
 function renderIntegrity(){
   const x=relationSummary();
   const defs=[
-    ["Spieler → Verein",x.playersClubs,DATA.players.length],
-    ["Spieler → Verband",x.playersAssociations,DATA.players.length],
-    ["Ergebnis → Spieler",x.resultPlayers,DATA.results.length],
-    ["Ergebnis → Turnier",x.resultTournaments,DATA.results.length],
-    ["Runde → Ergebnis",x.roundsResults,DATA.rounds.length],
-    ["DRL → Spieler",x.drlPlayers,DATA.drl.length],
-    ["DMV → Spieler",x.dmvPlayers,(DATA.dmv||[]).length]
+    ["Spieler → Verein",x.playersClubs,DATA.players.length,"players"],
+    ["Spieler → Verband",x.playersAssociations,DATA.players.length,"players"],
+    ["Ergebnis → Spieler",x.resultPlayers,DATA.results.length,"results"],
+    ["Ergebnis → Turnier",x.resultTournaments,DATA.results.length,"results"],
+    ["Runde → Ergebnis",x.roundsResults,DATA.rounds.length,"rounds"],
+    ["DRL → Spieler",x.drlPlayers,DATA.drl.length,"drl"],
+    ["DMV → Spieler",x.dmvPlayers,(DATA.dmv||[]).length,"dmv"]
   ];
-  return '<div class="history-section"><div class="history-title">Relationaler Datenstatus</div><div class="tablebox"><table><thead><tr><th>Beziehung</th><th>Verknüpft</th><th>Gesamt</th><th>Quote</th><th>Offen</th></tr></thead><tbody>'+defs.map(d=>{const open=Math.max(0,d[2]-d[1]);return '<tr><td>'+esc(d[0])+'</td><td>'+d[1].toLocaleString("de-DE")+'</td><td>'+d[2].toLocaleString("de-DE")+'</td><td>'+esc(d[2]?((d[1]/d[2])*100).toFixed(1)+" %":"–")+'</td><td>'+open.toLocaleString("de-DE")+'</td></tr>'}).join("")+'</tbody></table></div></div>';
+  return '<div class="history-section"><div class="history-title">Relationaler Datenstatus</div><div class="tablebox"><table><thead><tr><th>Beziehung</th><th>Verknüpft</th><th>Gesamt</th><th>Quote</th><th>Offen</th></tr></thead><tbody>'+defs.map(d=>{const open=Math.max(0,d[2]-d[1]);return '<tr><td>'+esc(d[0])+'</td><td>'+d[1].toLocaleString("de-DE")+'</td><td>'+d[2].toLocaleString("de-DE")+'</td><td>'+esc(d[2]?((d[1]/d[2])*100).toFixed(1)+" %":"–")+'</td><td>'+ (open?'<button class="linkbtn" onclick="setView(\''+d[3]+'\')">'+open.toLocaleString("de-DE")+' offene Datensätze</button>':'0')+'</td></tr>'}).join("")+'</tbody></table></div></div>';
 }
 function render(){const labels={players:"Spieler",clubs:"Vereine",associations:"Verbände",tournaments:"Turniere",results:"Ergebnisse",rounds:"Runden",drl:"DRL-Listen",dmv:"DMV-Daten"};$("#viewLabel").textContent=labels[state.view]||state.view;$("#title").textContent=state.detail?"Detailansicht":$("#viewLabel").textContent+"übersicht";const data=(DATA[state.view]||[]).filter(matches);$("#count").textContent=(state.detail?1:data.length).toLocaleString("de-DE")+" Datensätze";renderStats();if(state.detail){renderDetail();return}if(state.view==="drl"){$("#tablewrap").innerHTML=renderDrlTable(data)}else{renderTable(data)}if(!state.detail&&state.view==="players"&&!state.q)$("#detail").innerHTML=renderIntegrity()}
 $("#search").addEventListener("input",e=>{state.q=e.target.value;state.detail=null;render();renderSearchResults(e.target.value)});$("#clear").onclick=()=>{state.q="";$("#search").value="";state.detail=null;render();renderSearchResults("")};document.querySelectorAll("[data-view]").forEach(b=>b.onclick=()=>setView(b.dataset.view));$("#themeBtn").onclick=()=>document.body.classList.toggle("light");Promise.all(Object.keys(SOURCES).map(load)).then(()=>loadDRL()).then(render);
