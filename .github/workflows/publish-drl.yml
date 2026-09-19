@@ -10,6 +10,8 @@ on:
   push:
     paths:
       - "release/DRL_CANONICAL_SHARDS_213155.zip"
+      - "DRL_CANONICAL_SHARDS_213155.zip"
+      - ".github/workflows/publish-drl.yml"
 
 permissions:
   contents: write
@@ -30,6 +32,10 @@ jobs:
           if [ -n "${SOURCE_URL:-}" ]; then
             mkdir -p release
             curl -fL --retry 3 --retry-delay 2 "$SOURCE_URL" -o release/DRL_CANONICAL_SHARDS_213155.zip
+          fi
+          if [ ! -f release/DRL_CANONICAL_SHARDS_213155.zip ] && [ -f DRL_CANONICAL_SHARDS_213155.zip ]; then
+            mkdir -p release
+            cp DRL_CANONICAL_SHARDS_213155.zip release/DRL_CANONICAL_SHARDS_213155.zip
           fi
           test -f release/DRL_CANONICAL_SHARDS_213155.zip
 
