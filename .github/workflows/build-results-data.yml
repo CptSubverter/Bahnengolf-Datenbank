@@ -54,7 +54,7 @@ jobs:
 
           tournaments={}
           for r in rows:
-              tournaments.setdefault(r["code"],(r.get("date",""),r.get("tournament",""),r.get("location","")))
+              tournaments.setdefault(r.get("code",""),(r.get("date",""),r.get("tournament",""),r.get("location","")))
 
           with (out/"tournaments.csv").open("w",encoding="utf-8",newline="") as f:
               w=csv.writer(f); w.writerow(["tournament_id","date","tournament_name","location","source_code"])
@@ -68,7 +68,7 @@ jobs:
                   pid=players.get(str(r.get("player_pass","")),"")
                   cid=clubs.get(norm(r.get("result_club","")),"")
                   status="pass_verified" if pid else ("name_plus_club_review" if r.get("match_method")=="name+club" else "unresolved_identity")
-                  w.writerow([result_id(r),pid,r["code"],cid,r.get("place",""),r.get("total",""),r.get("average",""),status,r.get("source","")])
+                  w.writerow([result_id(r),pid,r.get("code",""),cid,r.get("place",""),r.get("total",""),r.get("average",""),status,r.get("source","")])
 
           with (out/"rounds.csv").open("w",encoding="utf-8",newline="") as f:
               w=csv.writer(f)
@@ -78,7 +78,7 @@ jobs:
                   rid=result_id(r)
                   status="pass_verified" if pid else ("name_plus_club_review" if r.get("match_method")=="name+club" else "unresolved_identity")
                   for no,score in enumerate(r.get("rounds") or [],1):
-                      w.writerow([f"{rid}-{no}",rid,pid,r["code"],no,score,status,r.get("source","")])
+                      w.writerow([f"{rid}-{no}",rid,pid,r.get("code",""),no,score,status,r.get("source","")])
 
           print(f"source_records={len(rows)}")
           print(f"tournaments={len(tournaments)}")
