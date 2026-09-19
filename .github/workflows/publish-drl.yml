@@ -2,6 +2,11 @@ name: Publish canonical DRL shards
 
 on:
   workflow_dispatch:
+    inputs:
+      source_url:
+        description: "Öffentliche URL zum kanonischen DRL-ZIP (optional; alternativ release/DRL_CANONICAL_SHARDS_213155.zip im Repository)"
+        required: false
+        type: string
   push:
     paths:
       - "release/DRL_CANONICAL_SHARDS_213155.zip"
@@ -16,11 +21,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Prepare canonical DRL archive
+        shell: bash
+        env:
+          SOURCE_URL: ${{ inputs.source_url }}
+        run: |
+          set -euo pipefail
+          if [ -n "${SOURCE_URL:-}" ]; then
+            mkdir -p release
+            curl -fL --retry 3 --retry-delay 2 "$SOURCE_URL" -o release/DRL_CANONICAL_SHARDS_213155.zip
+          fi
+          test -f release/DRL_CANONICAL_SHARDS_213155.zip
+
       - name: Extract and validate canonical DRL shards
         shell: bash
         run: |
           set -euo pipefail
-          test -f release/DRL_CANONICAL_SHARDS_213155.zip
           rm -rf /tmp/drl_release
           mkdir -p /tmp/drl_release
           unzip -q release/DRL_CANONICAL_SHARDS_213155.zip -d /tmp/drl_release
@@ -43,6 +59,14 @@ jobs:
           if total != 213155:
               raise SystemExit(f"Expected 213155 records, got {total}")
           PY
+
+      - name: Upload validated DRL release artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: DRL_CANONICAL_SHARDS_213155
+          path: release/DRL_CANONICAL_SHARDS_213155.zip
+          compression-level: 0
+          retention-days: 90
 
       - name: Publish shards
         shell: bash
