@@ -1,5 +1,5 @@
 {
-  "status": "drl_published",
+  "status": "core_and_drl_published",
   "players": 6438,
   "clubs": 402,
   "associations": 13,
@@ -16,5 +16,16 @@
   "drl_excluded_reason": "Original source page is not readable; completely ignored.",
   "drl_correction": "rangliste79.xls included (+2652 rows)",
   "public_drl_shards": true,
-  "drl_publication_verified": true
+  "drl_publication_verified": true,
+  "core_data_publication_verified": true,
+  "core_files": [
+    "data/players.csv",
+    "data/clubs.csv",
+    "data/associations.csv"
+  ],
+  "runtime_drl_identity_overrides": true,
+  "runtime_drl_rows_resolved_by_reviewed_overrides": 87,
+  "runtime_drl_distinct_pass_numbers_resolved": 17,
+  "runtime_drl_remaining_unresolved_rows": 915,
+  "runtime_drl_remaining_unresolved_distinct_pass_numbers": 84
 }
