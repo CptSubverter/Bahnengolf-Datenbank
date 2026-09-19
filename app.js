@@ -57,6 +57,8 @@ function renderIntegrity(){
 }
 
 function relationGapDetails(){const out=[];const add=(type,label,rows)=>{rows.slice(0,200).forEach(r=>out.push({type,label,id:ident(r),reason:relationReason(r,type),title:label(r)}))};add("players","Spieler",relationOpenRows("players"));add("clubs","Verein",relationOpenRows("clubs"));add("results","Ergebnis",relationOpenRows("results"));add("rounds","Runde",relationOpenRows("rounds"));add("drl","DRL",relationOpenRows("drl"));add("dmv","DMV",relationOpenRows("dmv"));return out}
+function relationTarget(view,key){const o=findById(view,key);return o?label(o):String(key||"—")}
+function relationFixHint(r,type){if(type==="players")return r.current_club_id?"Verein-ID prüfen":"aktuellen Verein ergänzen";if(type==="clubs")return r.association_id?"Verbands-ID prüfen":"Verband ergänzen";if(type==="results")return !r.player_id?"Spieler-ID ergänzen":!r.tournament_id?"Turnier-ID ergänzen":"Relation prüfen";if(type==="rounds")return r.result_id?"Ergebnis-ID prüfen":"Ergebnis-ID ergänzen";if(type==="drl"||type==="dmv")return r.player_id?"Spieler-ID prüfen":"Spielerzuordnung ergänzen";return"Relation prüfen"}
 function relationOpenRows(type){
   if(type==="players")return DATA.players.filter(x=>!x.current_club_id||!findById("clubs",x.current_club_id));
   if(type==="clubs")return DATA.clubs.filter(x=>!x.association_id||!findById("associations",x.association_id));
