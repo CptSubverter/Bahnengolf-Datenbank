@@ -35,7 +35,7 @@ function relationSummary(){
   };
 }
 function renderIntegrity(){
-  const x=relationSummary();
+  const x=relationSummary(), h=relationHealth();
   const defs=[
     ["Spieler → Verein",x.playersClubs,DATA.players.length,"players"],
     ["Spieler → Verband",x.playersAssociations,DATA.players.length,"players"],
@@ -49,8 +49,10 @@ function renderIntegrity(){
     ["DRL → Spieler",x.drlPlayers,DATA.drl.length,"drl"],
     ["DMV → Spieler",x.dmvPlayers,(DATA.dmv||[]).length,"dmv"]
   ];
-  return '<div class="history-section"><div class="history-title">Relationaler Datenstatus</div><div class="tablebox"><table><thead><tr><th>Beziehung</th><th>Verknüpft</th><th>Gesamt</th><th>Quote</th><th>Offen</th></tr></thead><tbody>'+defs.map(d=>{const open=Math.max(0,d[2]-d[1]);return '<tr><td>'+esc(d[0])+'</td><td>'+d[1].toLocaleString("de-DE")+'</td><td>'+d[2].toLocaleString("de-DE")+'</td><td>'+esc(d[2]?((d[1]/d[2])*100).toFixed(1)+" %":"–")+'</td><td>'+((open&&["players","results","rounds","drl","dmv"].includes(d[3]))?'<button class="linkbtn" onclick="showOpenRelations(\''+d[3]+'\')">'+open.toLocaleString("de-DE")+' offene Datensätze</button>':open.toLocaleString("de-DE"))+'</td></tr>'}).join("")+'</tbody></table></div></div><div id="open-relations"></div>';
+  const overall='<div class="history-links"><b>Gesamt:</b> '+h.linked.toLocaleString("de-DE")+' / '+h.total.toLocaleString("de-DE")+' Beziehungen verknüpft ('+h.quote.toFixed(1)+' %) · <b>offen:</b> '+h.open.toLocaleString("de-DE")+'</div>';
+  return '<div class="history-section"><div class="history-title">Relationaler Datenstatus</div>'+overall+'<div class="tablebox"><table><thead><tr><th>Beziehung</th><th>Verknüpft</th><th>Gesamt</th><th>Quote</th><th>Offen</th></tr></thead><tbody>'+defs.map(d=>{const open=Math.max(0,d[2]-d[1]);return '<tr><td>'+esc(d[0])+'</td><td>'+d[1].toLocaleString("de-DE")+'</td><td>'+d[2].toLocaleString("de-DE")+'</td><td>'+esc(d[2]?((d[1]/d[2])*100).toFixed(1)+" %":"–")+'</td><td>'+((open&&["players","results","rounds","drl","dmv"].includes(d[3]))?'<button class="linkbtn" onclick="showOpenRelations(\''+d[3]+'\')">'+open.toLocaleString("de-DE")+' offene Datensätze</button>':open.toLocaleString("de-DE"))+'</td></tr>'}).join("")+'</tbody></table></div></div><div id="open-relations"></div>';
 }
+
 function relationHealth(){
   const s=relationSummary(), checks=[
     ["Spieler → Verein",s.playersClubs,DATA.players.length],
