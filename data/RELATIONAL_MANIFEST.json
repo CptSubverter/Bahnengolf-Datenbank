@@ -1,5 +1,5 @@
 {
-  "version": "0.1.0-release-candidate",
+  "version": "0.1.1-release-candidate",
   "status": "build_complete_local_audit_pending_public_data_sync",
   "entities": {
     "players": 6438,
@@ -28,7 +28,7 @@
     "unresolved_rows": 1002,
     "unresolved_distinct_pass_numbers": 101,
     "valid_snapshot_added": "rangliste79.xls",
-    "malformed_snapshot_excluded": "rangliste83_2.xls"
+    "unreadable_source_excluded_completely": "rangliste83_2.xls"
   },
   "dmv_identity": {
     "pass_number": false,
@@ -40,7 +40,7 @@
   "release_blockers": [
     "canonical DRL shards still need public repository publication",
     "1002 historical DRL rows currently lack a link to the current 6438-player canonical table and must remain explicitly unresolved",
-    "one malformed DRL source file (rangliste83_2.xls) remains excluded pending recovery",
+    "rangliste83_2.xls is completely excluded because its source page is not readable",
     "DMV participation/result relations are not yet fully materialized"
   ]
 }
