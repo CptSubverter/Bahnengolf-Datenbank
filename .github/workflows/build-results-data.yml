@@ -48,8 +48,8 @@ jobs:
 
           def result_id(r):
               return hashlib.sha1("|".join(map(str,[
-                  r.get("code",""),r.get("place",""),r.get("player_key",""),
-                  r.get("total",""),r.get("player_name","")
+                  r.get("tournament_code",r.get("tournament_id","")),r.get("place",""),r.get("player_key",""),
+                  r.get("total",""),r.get("name","")
               ])).encode("utf-8")).hexdigest()[:20]
 
           tournaments={}
@@ -65,8 +65,8 @@ jobs:
               w=csv.writer(f)
               w.writerow(["result_id","player_id","tournament_id","club_id","place","total_score","average","identity_status","source"])
               for r in rows:
-                  pid=players.get(str(r.get("player_pass","")),"")
-                  cid=clubs.get(norm(r.get("result_club","")),"")
+                  pid=players.get(str(r.get("pass","")),"")
+                  cid=clubs.get(norm(r.get("club","")),"")
                   status="pass_verified" if pid else ("name_plus_club_review" if r.get("match_method")=="name+club" else "unresolved_identity")
                   w.writerow([result_id(r),pid,r.get("code",""),cid,r.get("place",""),r.get("total",""),r.get("average",""),status,r.get("source","")])
 
