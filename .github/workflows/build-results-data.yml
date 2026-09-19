@@ -35,50 +35,42 @@ jobs:
               for p in csv.DictReader(f):
                   players[p["pass_number"]]=p["player_id"]
 
-          clubs={}
-          with (out/"clubs.csv").open(encoding="utf-8") as f:
-              for c in csv.DictReader(f):
-                  clubs[c["normalized_name"]]=c["club_id"]
-
-          def norm(s):
-              s=str(s or "").casefold().strip()
-              s=re.sub(r"\b(e\.v\.|e\.v)\b","",s)
-              s=re.sub(r"\s+(?:i{1,5}|[1-5])$","",s)
-              return re.sub(r"\s+"," ",s).strip()
-
-          def result_id(r):
-              return hashlib.sha1("|".join(map(str,[
-                  r.get("tournament_code",r.get("tournament_id","")),r.get("place",""),r.get("player_key",""),
-                  r.get("total",""),r.get("name","")
-              ])).encode("utf-8")).hexdigest()[:20]
-
           tournaments={}
           for r in rows:
-              tournaments.setdefault(r.get("code",""),(r.get("date",""),r.get("tournament",""),r.get("location","")))
+              code=r.get("tournament_code") or r.get("tournament_id") or ""
+              tournaments.setdefault(code,(r.get("date",""),r.get("tournament",""),r.get("location","")))
+
+          def result_id(r):
+              return r.get("round_result_id") or hashlib.sha1(
+                  "|".join(map(str,[r.get("tournament_code",""),r.get("pass",""),r.get("name",""),r.get("total","")])).encode("utf-8")
+              ).hexdigest()[:20]
 
           with (out/"tournaments.csv").open("w",encoding="utf-8",newline="") as f:
-              w=csv.writer(f); w.writerow(["tournament_id","date","tournament_name","location","source_code"])
+              w=csv.writer(f)
+              w.writerow(["tournament_id","date","tournament_name","location","source_code"])
               for code,(date,name,location) in sorted(tournaments.items()):
-                  w.writerow([code,date,name,location,code])
+                  if code:
+                      w.writerow([code,date,name,location,code])
 
           with (out/"results.csv").open("w",encoding="utf-8",newline="") as f:
               w=csv.writer(f)
               w.writerow(["result_id","player_id","tournament_id","club_id","place","total_score","average","identity_status","source"])
               for r in rows:
+                  code=r.get("tournament_code") or r.get("tournament_id") or ""
                   pid=players.get(str(r.get("pass","")),"")
-                  cid=clubs.get(norm(r.get("club","")),"")
-                  status="pass_verified" if pid else ("name_plus_club_review" if r.get("match_method")=="name+club" else "unresolved_identity")
-                  w.writerow([result_id(r),pid,r.get("code",""),cid,r.get("place",""),r.get("total",""),r.get("average",""),status,r.get("source","")])
+                  status="pass_verified" if pid else "unresolved_identity"
+                  w.writerow([result_id(r),pid,code,"","",r.get("total",""),r.get("average",""),status,r.get("source","")])
 
           with (out/"rounds.csv").open("w",encoding="utf-8",newline="") as f:
               w=csv.writer(f)
               w.writerow(["round_id","result_id","player_id","tournament_id","round_no","score","identity_status","source"])
               for r in rows:
-                  pid=players.get(str(r.get("player_pass","")),"")
+                  code=r.get("tournament_code") or r.get("tournament_id") or ""
+                  pid=players.get(str(r.get("pass","")),"")
                   rid=result_id(r)
-                  status="pass_verified" if pid else ("name_plus_club_review" if r.get("match_method")=="name+club" else "unresolved_identity")
+                  status="pass_verified" if pid else "unresolved_identity"
                   for no,score in enumerate(r.get("rounds") or [],1):
-                      w.writerow([f"{rid}-{no}",rid,pid,r.get("code",""),no,score,status,r.get("source","")])
+                      w.writerow([f"{rid}-{no}",rid,pid,code,no,score,status,r.get("source","")])
 
           print(f"source_records={len(rows)}")
           print(f"tournaments={len(tournaments)}")
@@ -98,10 +90,10 @@ jobs:
             "tournaments": sum(1 for _ in csv.DictReader(open("data/tournaments.csv",encoding="utf-8"))),
             "results": sum(1 for _ in csv.DictReader(open("data/results.csv",encoding="utf-8"))),
             "rounds": sum(1 for _ in csv.DictReader(open("data/rounds.csv",encoding="utf-8"))),
-            "results_source": "Spielerdatenbank/rounds-01.json … rounds-04.json",
+            "results_source": "CptSubverter/Spielerdatenbank:data/rounds-01.json … rounds-04.json",
             "results_source_records": 27501,
             "results_source_rounds": 114777,
-            "results_identity_rule": "Passnummer direkt verknüpft; Name/Club-Fälle bleiben als Prüfstatus erhalten."
+            "results_identity_rule": "Passnummer direkt verknüpft; Datensätze ohne Passnummer bleiben ungeklärt."
           })
           p.write_text(json.dumps(x,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
           PY
