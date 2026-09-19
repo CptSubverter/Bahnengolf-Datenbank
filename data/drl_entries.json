@@ -1,10 +1,14 @@
 {
-  "version": "0.1.0",
-  "count": 210503,
-  "distinct_pass_numbers": 6361,
+  "version": "0.2.0",
+  "status": "metadata_only_until_canonical_shards_are_published",
+  "count": 213155,
+  "distinct_pass_numbers": 6539,
+  "linked_rows": 212153,
+  "unresolved_rows": 1002,
   "fields": [
     "drl_entry_id",
     "player_id",
+    "pass_number",
     "list_date",
     "rank",
     "value",
@@ -12,5 +16,12 @@
     "club_original",
     "lv_original",
     "source_record_id"
-  ]
+  ],
+  "source_files_parsed": 75,
+  "source_files_total": 76,
+  "excluded_source_file": "rangliste83_2.xls",
+  "excluded_reason": "Original source page is not readable; completely ignored.",
+  "included_correction": "rangliste79.xls",
+  "included_correction_rows": 2652,
+  "note": "This file is a metadata descriptor, not the 213155-row canonical dataset. The eight canonical JSON shards remain the authoritative local build until public publication."
 }
