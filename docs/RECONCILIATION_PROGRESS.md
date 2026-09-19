@@ -5,13 +5,13 @@
 Das DRL-Archiv enthält 76 fachliche Listen. 75 Dateien wurden nach automatischer Erkennung der Kopfzeile strukturell erfolgreich eingelesen.
 
 Auditierter Stand:
-- 210.503 DRL-Datenzeilen
-- 6.361 unterschiedliche Passnummern
-- 210.503 Zeilen per Passnummer genau einem Spieler-Kandidaten zugeordnet
-- 0 nicht zugeordnete Passnummern
+- 213.155 DRL-Datenzeilen aus 75 strukturell lesbaren Listen
+- 6.539 unterschiedliche Passnummern
+- 213.155 Zeilen mit numerischer Passnummer
 - 193 Passnummern mit historischen Namensvarianten
+- Zusätzlich wurde `rangliste79.xls` als gültige, bisher versehentlich ausgeschlossene DRL-Liste identifiziert: +2.652 Zeilen und +178 Passnummern gegenüber dem bisherigen kanonischen Stand
 
-Eine Datei (rangliste83_2.xls) ist technisch nicht als normales BIFF-Arbeitsbuch lesbar und bleibt bis zu einer validen Quelldarstellung ausgeschlossen.
+Eine Datei (`rangliste83_2.xls`) bleibt wegen der ungewöhnlichen/malformed Tabellenstruktur bis zu einer validen Quelldarstellung ausgeschlossen. Die übrigen 75 Listen sind jetzt technisch lesbar.
 
 ## DMV-Ergebnisse 2015–2025
 
