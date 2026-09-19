@@ -39,39 +39,17 @@ function renderIntegrity(){
   const defs=[
     ["Spieler → Verein",x.playersClubs,DATA.players.length,"players"],
     ["Spieler → Verband",x.playersAssociations,DATA.players.length,"players"],
+    ["Verein → Verband",x.clubAssociations,DATA.clubs.length,"clubs"],
     ["Ergebnis → Spieler",x.resultPlayers,DATA.results.length,"results"],
     ["Ergebnis → Turnier",x.resultTournaments,DATA.results.length,"results"],
+    ["Ergebnis → Verein",x.resultClubs,DATA.results.length,"results"],
     ["Runde → Ergebnis",x.roundsResults,DATA.rounds.length,"rounds"],
+    ["Runde → Spieler",x.roundPlayers,DATA.rounds.length,"rounds"],
+    ["Runde → Turnier",x.roundTournaments,DATA.rounds.length,"rounds"],
     ["DRL → Spieler",x.drlPlayers,DATA.drl.length,"drl"],
     ["DMV → Spieler",x.dmvPlayers,(DATA.dmv||[]).length,"dmv"]
   ];
-  return '<div class="history-section"><div class="history-title">Relationaler Datenstatus</div><div class="tablebox"><table><thead><tr><th>Beziehung</th><th>Verknüpft</th><th>Gesamt</th><th>Quote</th><th>Offen</th></tr></thead><tbody>'+defs.map(d=>{const open=Math.max(0,d[2]-d[1]);return '<tr><td>'+esc(d[0])+'</td><td>'+d[1].toLocaleString("de-DE")+'</td><td>'+d[2].toLocaleString("de-DE")+'</td><td>'+esc(d[2]?((d[1]/d[2])*100).toFixed(1)+" %":"–")+'</td><td>'+(open?'<button class="linkbtn" onclick="showOpenRelations(\''+d[3]+'\')">'+open.toLocaleString("de-DE")+' offene Datensätze</button>':'0')+'</td></tr>'}).join("")+'</tbody></table></div></div><div id="open-relations"></div>';
-}
-function relationReason(r,type){
-  if(type==="players"){
-    if(!r.current_club_id)return"Kein aktueller Verein";
-    if(!findById("clubs",r.current_club_id))return"Verein nicht vorhanden";
-    return"Nicht eindeutig verknüpft";
-  }
-  if(type==="results"){
-    if(!r.player_id)return"Spieler-ID fehlt";
-    if(!findById("players",r.player_id))return"Spieler nicht vorhanden";
-    if(!r.tournament_id)return"Turnier-ID fehlt";
-    if(!findById("tournaments",r.tournament_id))return"Turnier nicht vorhanden";
-    return"Relation offen";
-  }
-  if(type==="rounds")return!r.result_id?"Ergebnis-ID fehlt":"Ergebnis nicht vorhanden";
-  if(type==="drl")return!r.player_id?"Keine Spielerzuordnung":"Spieler nicht vorhanden";
-  if(type==="dmv")return!r.player_id?"Keine Spielerzuordnung":"Spieler nicht vorhanden";
-  return"Relation offen";
-}
-function showOpenRelations(type){
-  const rows=relationOpenRows(type),box=$("#open-relations");if(!box)return;
-  const title={players:"Offene Spieler-Zuordnungen",results:"Offene Ergebnis-Zuordnungen",rounds:"Offene Runden-Zuordnungen",drl:"Offene DRL-Zuordnungen",dmv:"Offene DMV-Zuordnungen"}[type]||"Offene Zuordnungen";
-  const counts={};rows.forEach(r=>{const reason=relationReason(r,type);counts[reason]=(counts[reason]||0)+1});
-  const summary=Object.entries(counts).map(([k,v])=>'<span class="history-stat"><b>'+v.toLocaleString("de-DE")+'</b> '+esc(k)+'</span>').join("");
-  box.innerHTML='<div class="history-section"><div class="history-title">'+esc(title)+'</div><div class="history-links">'+summary+'</div><div class="tablebox"><table><thead><tr><th>ID</th><th>Name / Bezeichnung</th><th>Grund</th><th>Hinweis</th></tr></thead><tbody>'+rows.slice(0,500).map(r=>{const id=r.player_id||r.result_id||r.round_id||r.drl_entry_id||r.id||"";const name=label(r);const hint=r.pass_number||r.tournament_name||r.club_name||r.result_id||r.tournament_id||"nicht verknüpft";return '<tr><td>'+esc(id)+'</td><td>'+esc(name)+'</td><td>'+esc(relationReason(r,type))+'</td><td>'+esc(hint)+'</td></tr>'}).join("")+'</tbody></table></div><div class="history-stat">'+rows.length.toLocaleString("de-DE")+' offene Datensätze; Anzeige auf 500 begrenzt.</div></div>';
-  box.scrollIntoView({behavior:"smooth",block:"start"});
+  return '<div class="history-section"><div class="history-title">Relationaler Datenstatus</div><div class="tablebox"><table><thead><tr><th>Beziehung</th><th>Verknüpft</th><th>Gesamt</th><th>Quote</th><th>Offen</th></tr></thead><tbody>'+defs.map(d=>{const open=Math.max(0,d[2]-d[1]);return '<tr><td>'+esc(d[0])+'</td><td>'+d[1].toLocaleString("de-DE")+'</td><td>'+d[2].toLocaleString("de-DE")+'</td><td>'+esc(d[2]?((d[1]/d[2])*100).toFixed(1)+" %":"–")+'</td><td>'+((open&&["players","results","rounds","drl","dmv"].includes(d[3]))?'<button class="linkbtn" onclick="showOpenRelations(\''+d[3]+'\')">'+open.toLocaleString("de-DE")+' offene Datensätze</button>':open.toLocaleString("de-DE"))+'</td></tr>'}).join("")+'</tbody></table></div></div><div id="open-relations"></div>';
 }
 function render(){const labels={players:"Spieler",clubs:"Vereine",associations:"Verbände",tournaments:"Turniere",results:"Ergebnisse",rounds:"Runden",drl:"DRL-Listen",dmv:"DMV-Daten"};$("#viewLabel").textContent=labels[state.view]||state.view;$("#title").textContent=state.detail?"Detailansicht":$("#viewLabel").textContent+"übersicht";const data=(DATA[state.view]||[]).filter(matches);$("#count").textContent=(state.detail?1:data.length).toLocaleString("de-DE")+" Datensätze";renderStats();if(state.detail){renderDetail();return}if(state.view==="drl"){$("#tablewrap").innerHTML=renderDrlTable(data)}else{renderTable(data)}if(!state.detail&&state.view==="players"&&!state.q)$("#detail").innerHTML=renderIntegrity()}
 $("#search").addEventListener("input",e=>{state.q=e.target.value;state.detail=null;render();renderSearchResults(e.target.value)});$("#clear").onclick=()=>{state.q="";$("#search").value="";state.detail=null;render();renderSearchResults("")};document.querySelectorAll("[data-view]").forEach(b=>b.onclick=()=>setView(b.dataset.view));$("#themeBtn").onclick=()=>document.body.classList.toggle("light");Promise.all(Object.keys(SOURCES).map(load)).then(()=>loadDRL()).then(render);
