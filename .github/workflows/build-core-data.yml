@@ -1,0 +1,88 @@
+name: Build canonical core data
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/build-core-data.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build players, clubs and associations
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import csv, json, re, urllib.request
+          from collections import Counter
+          from pathlib import Path
+
+          BASE="https://raw.githubusercontent.com/CptSubverter/Spielerdatenbank/main/data"
+          players=[]
+          for i in range(1,9):
+              with urllib.request.urlopen(f"{BASE}/players-{i:02d}.json") as f:
+                  players.extend(json.load(f))
+          players=[p for p in players if p.get("pass")]
+
+          def norm(s):
+              s=str(s or "").casefold().strip()
+              s=re.sub(r"\b(e\.v\.|e\.v)\b","",s)
+              s=re.sub(r"\s+(?:i{1,5}|[1-5])$","",s)
+              return re.sub(r"\s+"," ",s).strip()
+
+          clubs=sorted({p["club"].strip() for p in players if p.get("club","").strip()}, key=norm)
+          club_id={c:str(i+1) for i,c in enumerate(clubs)}
+
+          assoc_order=["BBS","BMV","BVS","BVBB","BVSA","HBV","HBSV","MRP","MVBN","NBV","SaarMV","SHMV","WBV"]
+          assoc_id={a:str(i+1) for i,a in enumerate(assoc_order)}
+          assoc_names={
+            "BBS":"Bahnengolfverband Berlin-Brandenburg",
+            "BMV":"Bayerischer Minigolfsport Verband",
+            "BVS":"Bremer Minigolfsportverband",
+            "BVBB":"Brandenburgischer Bahnengolfverband",
+            "BVSA":"Bahnengolfverband Sachsen-Anhalt",
+            "HBV":"Hamburger Bahnengolf Verband",
+            "HBSV":"Hessischer Bahnengolf Sportverband",
+            "MRP":"Minigolfverband Rheinland-Pfalz",
+            "MVBN":"Minigolfverband Niedersachsen/Bremen",
+            "NBV":"Nordrhein-Westfälischer Bahnengolf-Verband",
+            "SaarMV":"Saarländischer Minigolfsport-Verband",
+            "SHMV":"Schleswig-Holsteinischer Minigolf-Verband",
+            "WBV":"Württembergischer Bahnengolfverband"
+          }
+
+          out=Path("data"); out.mkdir(exist_ok=True)
+
+          with (out/"players.csv").open("w",encoding="utf-8",newline="") as f:
+              w=csv.writer(f); w.writerow(["player_id","pass_number","name","normalized_name","current_club_id","current_association_id","identity_status"])
+              for p in sorted(players,key=lambda p:int(p["pass"]) if str(p["pass"]).isdigit() else 10**20):
+                  club=p.get("club","").strip(); lv=p.get("lv","").strip()
+                  w.writerow([p["pass"],p["pass"],p.get("name",""),norm(p.get("name","")),club_id.get(club,""),assoc_id.get(lv,""),"pass_verified"])
+
+          with (out/"clubs.csv").open("w",encoding="utf-8",newline="") as f:
+              w=csv.writer(f); w.writerow(["club_id","canonical_name","normalized_name","association_id"])
+              for c in clubs:
+                  lv=Counter(p.get("lv","").strip() for p in players if p.get("club","").strip()==c and p.get("lv","").strip() in assoc_id).most_common(1)
+                  w.writerow([club_id[c],c,norm(c),assoc_id.get(lv[0][0],"") if lv else ""])
+
+          with (out/"associations.csv").open("w",encoding="utf-8",newline="") as f:
+              w=csv.writer(f); w.writerow(["association_id","association_name","abbreviation"])
+              for a in assoc_order: w.writerow([assoc_id[a],assoc_names[a],a])
+
+          print(f"players={len(players)} clubs={len(clubs)} associations={len(assoc_order)}")
+          PY
+
+      - name: Commit canonical core data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/players.csv data/clubs.csv data/associations.csv
+          git diff --cached --quiet && exit 0
+          git commit -m "Publish canonical player and club core data"
+          git push
