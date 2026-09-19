@@ -53,6 +53,49 @@ function renderIntegrity(){
   return '<div class="history-section"><div class="history-title">Relationaler Datenstatus</div>'+overall+'<div class="tablebox"><table><thead><tr><th>Beziehung</th><th>Verknüpft</th><th>Gesamt</th><th>Quote</th><th>Offen</th></tr></thead><tbody>'+defs.map(d=>{const open=Math.max(0,d[2]-d[1]);return '<tr><td>'+esc(d[0])+'</td><td>'+d[1].toLocaleString("de-DE")+'</td><td>'+d[2].toLocaleString("de-DE")+'</td><td>'+esc(d[2]?((d[1]/d[2])*100).toFixed(1)+" %":"–")+'</td><td>'+((open&&["players","results","rounds","drl","dmv"].includes(d[3]))?'<button class="linkbtn" onclick="showOpenRelations(\''+d[3]+'\')">'+open.toLocaleString("de-DE")+' offene Datensätze</button>':open.toLocaleString("de-DE"))+'</td></tr>'}).join("")+'</tbody></table></div></div><div id="open-relations"></div>';
 }
 
+function relationOpenRows(type){
+  if(type==="players")return DATA.players.filter(x=>!x.current_club_id||!findById("clubs",x.current_club_id));
+  if(type==="clubs")return DATA.clubs.filter(x=>!x.association_id||!findById("associations",x.association_id));
+  if(type==="results")return DATA.results.filter(x=>!x.player_id||!findById("players",x.player_id)||!x.tournament_id||!findById("tournaments",x.tournament_id));
+  if(type==="rounds")return DATA.rounds.filter(x=>!x.result_id||!findById("results",x.result_id));
+  if(type==="drl")return DATA.drl.filter(x=>!x.player_id||!findById("players",x.player_id));
+  if(type==="dmv")return (DATA.dmv||[]).filter(x=>!x.player_id||!findById("players",x.player_id));
+  return [];
+}
+function relationReason(r,type){
+  if(type==="clubs"){
+    if(!r.association_id)return"Kein Verband zugeordnet";
+    if(!findById("associations",r.association_id))return"Verband nicht vorhanden";
+    return"Relation offen";
+  }
+  if(type==="players"){
+    if(!r.current_club_id)return"Kein aktueller Verein";
+    if(!findById("clubs",r.current_club_id))return"Verein nicht vorhanden";
+    return"Nicht eindeutig verknüpft";
+  }
+  if(type==="results"){
+    if(!r.player_id)return"Spieler-ID fehlt";
+    if(!findById("players",r.player_id))return"Spieler nicht vorhanden";
+    if(!r.tournament_id)return"Turnier-ID fehlt";
+    if(!findById("tournaments",r.tournament_id))return"Turnier nicht vorhanden";
+    return"Relation offen";
+  }
+  if(type==="rounds")return!r.result_id?"Ergebnis-ID fehlt":"Ergebnis nicht vorhanden";
+  if(type==="drl"||type==="dmv")return!r.player_id?"Keine Spielerzuordnung":"Spieler nicht vorhanden";
+  return"Relation offen";
+}
+function unresolvedFilter(type,reason){
+  const rows=relationOpenRows(type);
+  return reason?rows.filter(r=>relationReason(r,type)===reason):rows;
+}
+function showOpenRelations(type,reason){
+  const rows=unresolvedFilter(type,reason),box=$("#open-relations");if(!box)return;
+  const title={players:"Offene Spieler-Zuordnungen",clubs:"Offene Vereins-Zuordnungen",results:"Offene Ergebnis-Zuordnungen",rounds:"Offene Runden-Zuordnungen",drl:"Offene DRL-Zuordnungen",dmv:"Offene DMV-Zuordnungen"}[type]||"Offene Zuordnungen";
+  const counts={};relationOpenRows(type).forEach(r=>{const q=relationReason(r,type);counts[q]=(counts[q]||0)+1});
+  const summary=Object.entries(counts).map(([k,v])=>'<button class="linkbtn" onclick="showOpenRelations(\''+type+'\',\''+k.replace(/'/g,"\\'")+'\')">'+v.toLocaleString("de-DE")+' · '+esc(k)+'</button>').join(" ");
+  box.innerHTML='<div class="history-section"><div class="history-title">'+esc(title)+'</div><div class="history-links">'+summary+' <button class="linkbtn" onclick="showOpenRelations(\''+type+'\')">Alle</button></div><div class="tablebox"><table><thead><tr><th>ID</th><th>Name / Bezeichnung</th><th>Grund</th><th>Hinweis</th></tr></thead><tbody>'+rows.slice(0,500).map(r=>{const id=r.player_id||r.club_id||r.result_id||r.round_id||r.drl_entry_id||r.dmv_entry_id||r.id||"";const name=label(r);const hint=r.pass_number||r.tournament_name||r.club_name||r.association_name||r.result_id||r.tournament_id||"nicht verknüpft";return '<tr><td>'+esc(id)+'</td><td>'+esc(name)+'</td><td>'+esc(relationReason(r,type))+'</td><td>'+esc(hint)+'</td></tr>'}).join("")+'</tbody></table></div><div class="history-stat">'+rows.length.toLocaleString("de-DE")+' Datensätze im aktuellen Filter; Anzeige auf 500 begrenzt.</div></div>';
+  box.scrollIntoView({behavior:"smooth",block:"start"});
+}
 function relationHealth(){
   const s=relationSummary(), checks=[
     ["Spieler → Verein",s.playersClubs,DATA.players.length],
