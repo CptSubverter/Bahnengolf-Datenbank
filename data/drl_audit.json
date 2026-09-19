@@ -4,12 +4,15 @@
   "source_files_without_header": 1,
   "rows": 213155,
   "distinct_pass_numbers": 6539,
-  "matched_rows": 213155,
-  "unmatched_pass_numbers": 0,
+  "matched_rows": 212153,
+  "unmatched_rows": 1002,
+  "unmatched_distinct_pass_numbers": 101,
   "canonical_player_rows": 6438,
   "pass_name_variant_groups": 193,
-  "status": "source_recheck_successful; rangliste79 validated; rangliste83_2 remains excluded pending recovery",
+  "status": "source_recheck_successful; rangliste79 validated; canonical relation audit found 1002 historical DRL rows whose pass numbers are not present in the current 6438-player canonical table",
   "newly_included_snapshot": "rangliste79.xls",
   "newly_included_rows": 2652,
-  "newly_included_pass_numbers": 178
+  "newly_included_pass_numbers": 178,
+  "excluded_source_file": "rangliste83_2.xls",
+  "excluded_reason": "malformed source representation; no standard DRL header"
 }
