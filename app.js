@@ -65,8 +65,9 @@ function relationHealth(){
     ["DRL → Spieler",s.drlPlayers,DATA.drl.length],
     ["DMV → Spieler",s.dmvPlayers,(DATA.dmv||[]).length]
   ];
-  const total=checks.reduce((a,x)=>a+x[2],0), linked=checks.reduce((a,x)=>a+x[1],0);
-  return {checks,total,linked,open:total-linked,quote:total?linked/total*100:0};
+  const total=checks.reduce((a,x)=>a+x[2],0),linked=checks.reduce((a,x)=>a+x[1],0);
+  return {checks,total,linked,open:Math.max(0,total-linked),quote:total?linked/total*100:0};
 }
+
 function render(){const labels={players:"Spieler",clubs:"Vereine",associations:"Verbände",tournaments:"Turniere",results:"Ergebnisse",rounds:"Runden",drl:"DRL-Listen",dmv:"DMV-Daten"};$("#viewLabel").textContent=labels[state.view]||state.view;$("#title").textContent=state.detail?"Detailansicht":$("#viewLabel").textContent+"übersicht";const data=(DATA[state.view]||[]).filter(matches);$("#count").textContent=(state.detail?1:data.length).toLocaleString("de-DE")+" Datensätze";renderStats();if(state.detail){renderDetail();return}if(state.view==="drl"){$("#tablewrap").innerHTML=renderDrlTable(data)}else{renderTable(data)}if(!state.detail&&state.view==="players"&&!state.q)$("#detail").innerHTML=renderIntegrity()}
 $("#search").addEventListener("input",e=>{state.q=e.target.value;state.detail=null;render();renderSearchResults(e.target.value)});$("#clear").onclick=()=>{state.q="";$("#search").value="";state.detail=null;render();renderSearchResults("")};document.querySelectorAll("[data-view]").forEach(b=>b.onclick=()=>setView(b.dataset.view));$("#themeBtn").onclick=()=>document.body.classList.toggle("light");Promise.all(Object.keys(SOURCES).map(load)).then(()=>loadDRL()).then(render);
