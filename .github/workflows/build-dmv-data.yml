@@ -12,16 +12,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Prepare DMV publication contract
+      - name: Verify DMV source manifest
         run: |
           python - <<'PY'
           import json
-          p="data/dmv_participation_manifest.json"
-          x=json.load(open(p))
+          x=json.load(open("data/dmv_participation_manifest.json"))
           assert x["records"]==155997
           assert x["distinct_pass_numbers"]==4914
           assert x["excluded_years"]==[2020,2021]
-          print("DMV manifest verified: 155997 records / 4914 pass numbers")
+          print("DMV manifest verified")
+          PY
+      - name: Verify current DMV publication files
+        run: |
+          python - <<'PY'
+          import csv
+          with open("data/dmv_entries.csv",newline="",encoding="utf-8") as f:
+              rows=list(csv.DictReader(f))
+          if len(rows)==0:
+              raise SystemExit("dmv_entries.csv is empty.")
+          print("dmv_entries.csv rows:",len(rows))
           PY
       - name: Update database status
         run: |
@@ -34,7 +43,7 @@ jobs:
           x["dmv_participation_distinct_pass_numbers"]=4914
           x["dmv_participation_years"]=[2015,2016,2017,2018,2019,2022,2023,2024,2025]
           x["dmv_participation_excluded_years"]=[2020,2021]
-          x["dmv_participation_status"]="source_verified_locally_ready_for_publication"
+          x["dmv_participation_status"]="publication_pending_full_csv"
           json.dump(x,open(p,"w"),ensure_ascii=False,indent=2); print()
           PY
       - name: Commit status
@@ -42,5 +51,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/database_status.json
-          git diff --cached --quiet || git commit -m "Document verified DMV participation source"
+          git diff --cached --quiet || git commit -m "Track DMV publication readiness"
           git push
