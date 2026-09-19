@@ -1,0 +1,20 @@
+{
+  "version": "1.0.0",
+  "status": "canonical_drl_build_local_ready",
+  "rows": 213155,
+  "distinct_pass_numbers": 6539,
+  "canonical_players": 6438,
+  "linked_rows": 212153,
+  "unresolved_rows": 1002,
+  "unresolved_distinct_pass_numbers": 101,
+  "source_files_parsed": 75,
+  "source_files_total": 76,
+  "excluded_source_file": "rangliste83_2.xls",
+  "excluded_reason": "malformed source representation; no standard DRL header",
+  "included_correction": "rangliste79.xls",
+  "included_correction_rows": 2652,
+  "publication": {
+    "shards_local_ready": 8,
+    "public_repo_shards": false
+  }
+}
