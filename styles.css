@@ -8,3 +8,5 @@
 .search-type{min-width:82px;color:#aaa;font-size:.75rem}
 .search-empty{padding:14px;color:#aaa}
 header{position:relative}
+
+.drl-status{margin:0 0 12px;padding:10px 12px;border-radius:8px;border:1px solid #555;font-size:.85rem}.drl-status.ok{border-color:#2fa7fa}.drl-status.warn{border-color:#a66}
