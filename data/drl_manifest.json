@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "1.0.1",
   "status": "canonical_drl_build_local_ready",
   "rows": 213155,
   "distinct_pass_numbers": 6539,
@@ -10,11 +10,12 @@
   "source_files_parsed": 75,
   "source_files_total": 76,
   "excluded_source_file": "rangliste83_2.xls",
-  "excluded_reason": "malformed source representation; no standard DRL header",
+  "excluded_reason": "The corresponding source page is not readable. The source is therefore completely ignored and contributes zero canonical DRL rows.",
   "included_correction": "rangliste79.xls",
   "included_correction_rows": 2652,
   "publication": {
     "shards_local_ready": 8,
-    "public_repo_shards": false
+    "public_repo_shards": false,
+    "next_step": "Publish the eight canonical JSON shards without changing their contents; then expose them through the relational app."
   }
 }
