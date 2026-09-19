@@ -2,11 +2,14 @@
   "source_files_total": 76,
   "source_files_parsed": 75,
   "source_files_without_header": 1,
-  "rows": 210503,
-  "distinct_pass_numbers": 6361,
-  "matched_rows": 210503,
+  "rows": 213155,
+  "distinct_pass_numbers": 6539,
+  "matched_rows": 213155,
   "unmatched_pass_numbers": 0,
   "canonical_player_rows": 6438,
   "pass_name_variant_groups": 193,
-  "status": "pass_reconciliation_successful_with_one_technical_source_exception"
+  "status": "source_recheck_successful; rangliste79 validated; rangliste83_2 remains excluded pending recovery",
+  "newly_included_snapshot": "rangliste79.xls",
+  "newly_included_rows": 2652,
+  "newly_included_pass_numbers": 178
 }
