@@ -1,0 +1,33 @@
+{
+  "version": "0.2.0",
+  "status": "reviewed_historical_drl_overrides",
+  "source": "DRL_CANONICAL_SHARDS_213155.zip",
+  "unresolved_rows_before": 1002,
+  "unresolved_distinct_pass_numbers_before": 101,
+  "resolved_rows_by_override": 87,
+  "resolved_distinct_pass_numbers_by_override": 17,
+  "remaining_unresolved_rows": 915,
+  "remaining_unresolved_distinct_pass_numbers": 84,
+  "rules": {
+    "match": "Exact unique canonical player name AND the same DRL source file occurs in that player history. Historical pass number is then linked to that player for all unresolved rows with that exact pass number. No fuzzy matching, no club-only matching."
+  },
+  "overrides": [
+    {"historical_pass_number":"1010933","name":"Könemann, Bernd","player_id":"66181","current_pass_number":"66181","evidence":"exact unique name + same source file in canonical player history (rangliste34.xlsx)"},
+    {"historical_pass_number":"1011818","name":"Weber, Herbert","player_id":"33444","current_pass_number":"33444","evidence":"exact unique name + same source file in canonical player history (rangliste27.xlsx)"},
+    {"historical_pass_number":"1013862","name":"Baumgart, Dirk","player_id":"29220","current_pass_number":"29220","evidence":"exact unique name + same source file in canonical player history (rangliste28.xlsx)"},
+    {"historical_pass_number":"1013864","name":"Arens, Ingo","player_id":"27450","current_pass_number":"27450","evidence":"exact unique name + same source file in canonical player history (rangliste40.xlsx)"},
+    {"historical_pass_number":"1015307","name":"Walther, Markus","player_id":"66125","current_pass_number":"66125","evidence":"exact unique name + same source file in canonical player history (rangliste34.xlsx)"},
+    {"historical_pass_number":"1015323","name":"Habicht, Dennis","player_id":"66846","current_pass_number":"66846","evidence":"exact unique name + same source file in canonical player history (rangliste55.xlsx)"},
+    {"historical_pass_number":"1017664","name":"Arendt, Christian","player_id":"35126","current_pass_number":"35126","evidence":"exact unique name + same source file in canonical player history (rangliste40.xlsx)"},
+    {"historical_pass_number":"1020024","name":"Kinnemann, Bernd","player_id":"2053","current_pass_number":"2053","evidence":"exact unique name + same source file in canonical player history (rangliste33.xlsx)"},
+    {"historical_pass_number":"1020049","name":"Laurenz, Horst","player_id":"66198","current_pass_number":"66198","evidence":"exact unique name + same source file in canonical player history (rangliste34.xlsx)"},
+    {"historical_pass_number":"1021153","name":"Brendler, Steffen","player_id":"87505","current_pass_number":"87505","evidence":"exact unique name + same source file in canonical player history (rangliste75.xlsx)"},
+    {"historical_pass_number":"2065832","name":"Catterfeld, Doreen","player_id":"65832","current_pass_number":"65832","evidence":"exact unique name + same source file in canonical player history (rangliste42.xlsx)"},
+    {"historical_pass_number":"3137196","name":"Becker, Jochen","player_id":"67480","current_pass_number":"67480","evidence":"exact unique name + same source file in canonical player history (rangliste74.xlsx)"},
+    {"historical_pass_number":"3185488","name":"Reinhardt, André","player_id":"67337","current_pass_number":"67337","evidence":"exact unique name + same source file in canonical player history (rangliste72.xlsx)"},
+    {"historical_pass_number":"3271353","name":"Kinnemann, Bernd","player_id":"2053","current_pass_number":"2053","evidence":"exact unique name + same source file in canonical player history (rangliste92.xlsx)"},
+    {"historical_pass_number":"3431479","name":"Hartenbach, Paul","player_id":"23282","current_pass_number":"23282","evidence":"exact unique name + same source file in canonical player history (rangliste85.xlsx)"},
+    {"historical_pass_number":"3532851","name":"Neumann, Sebastian","player_id":"68175","current_pass_number":"68175","evidence":"exact unique name + same source file in canonical player history (rangliste92.xlsx)"},
+    {"historical_pass_number":"3582907","name":"Bargel, Siegfried","player_id":"68138","current_pass_number":"68138","evidence":"exact unique name + same source file in canonical player history (rangliste92.xlsx)"}
+  ]
+}
