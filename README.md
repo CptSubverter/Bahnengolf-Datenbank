@@ -35,11 +35,13 @@ Von 213.155 DRL-Zeilen sind derzeit 212.153 mit dem aktuellen Spielerbestand ver
 - Spieler → DRL über Passnummer bzw. Player-ID, sofern eindeutig vorhanden
 - DMV-Daten bleiben bei nicht eindeutiger Identität ausdrücklich als ungeklärt/mehrdeutig gekennzeichnet.
 
-## Veröffentlichung
+## DRL-Release-Paket
 
-Die Anwendung ist für die acht kanonischen DRL-Shards vorbereitet. Die Shards liegen als geprüfter lokaler Build vor, sind aber noch nicht vollständig im öffentlichen Repository veröffentlicht. Bis zur Veröffentlichung bleibt dieser Punkt ein Release-Blocker.
+Der geprüfte kanonische Shard-Bestand ist als `DRL_CANONICAL_SHARDS_213155.zip` archiviert und enthält acht JSON-Shards mit zusammen **213.155 Datensätzen**.
 
-Die Datenbank verwendet keine Daten aus der nicht lesbaren `rangliste83_2.xls`.
+Die Prüfinformationen zu allen acht Shards sind in `data/drl_release_package.json` dokumentiert.
+
+Die eigentlichen acht JSON-Shards sind derzeit noch nicht vollständig im öffentlichen Repository veröffentlicht. Deshalb bleibt `public_drl_shards` bewusst auf `false`. Es wird kein unvollständiger oder abgeschnittener Shard veröffentlicht.
 
 ## Projektziel
 
