@@ -9,9 +9,9 @@ Relationale Bahnengolf-Datenbank für Spieler, Vereine, Verbände, Turniere, Erg
 | Spieler | 6.438 |
 | Vereine | 402 |
 | Verbände | 13 |
-| Turniere | 963 |
-| DMV-Ergebnisse | 52.915 |
-| Runden | 135.837 |
+| Turniere | 2.633 |
+| DMV-Ergebnisse / Ergebnisdatensätze | 27.501 |
+| Runden | 114.777 |
 | DRL-Einträge | 213.155 |
 | DRL-Passnummern | 6.539 |
 | Historische Spieler/Verein-Zuordnungen | 34.195 |
@@ -59,5 +59,9 @@ Die Prüfinformationen zu allen acht Shards sind in `data/drl_release_package.js
 Die acht JSON-Shards sind jetzt vollständig im öffentlichen Repository unter `data/` veröffentlicht. Zusammen enthalten sie **213.155 Datensätze**. Der veröffentlichte Bestand wurde vor der Veröffentlichung auf Vollständigkeit geprüft.
 
 ## Projektziel
+
+### Ergebnis-/Rundenquelle
+
+Der aktuell veröffentlichte Ergebnisbestand umfasst **27.501 Ergebnisdatensätze**, **114.777 Einzelrunden** und **2.633 aus diesen Datensätzen abgeleitete Turniere**. Die Quelle ist `CptSubverter/Spielerdatenbank`, `data/rounds-01.json` bis `data/rounds-04.json`. Die zugrunde liegenden Jahre sind 2015–2019 sowie 2022–2025; 2020/2021 sind in dieser Quelle ausgeschlossen. Datensätze ohne eindeutige Passnummer werden nicht künstlich einem Spieler zugeordnet.
 
 Eine durchsuchbare, responsive Datenbank mit stabilen Verknüpfungen zwischen Spieler, Passnummer, Verein, Verband, Turnier, Ergebnis, Runde, DRL und DMV.
