@@ -31,5 +31,44 @@
   "results_source": "CptSubverter/Spielerdatenbank:data/rounds-01.json … rounds-04.json",
   "results_source_records": 27501,
   "results_source_rounds": 114777,
-  "results_identity_rule": "Passnummer direkt verknüpft; Datensätze ohne Passnummer bleiben ungeklärt."
+  "results_identity_rule": "Passnummer direkt verknüpft; Datensätze ohne Passnummer bleiben ungeklärt.",
+  "dmv_participation_source_verified": true,
+  "dmv_participation_records": 156744,
+  "dmv_participation_rows_with_pass_source_key": 155395,
+  "dmv_participation_rows_without_pass_source_key": 1349,
+  "dmv_participation_distinct_pass_source_keys": 4913,
+  "dmv_participation_years": [
+    2015,
+    2016,
+    2017,
+    2018,
+    2019,
+    2022,
+    2023,
+    2024,
+    2025
+  ],
+  "dmv_participation_excluded_years": [
+    2020,
+    2021
+  ],
+  "dmv_participation_status": "public_shards_verified",
+  "dmv_public_shards": [
+    "data/dmv_entries_01.csv",
+    "data/dmv_entries_02.csv",
+    "data/dmv_entries_03.csv",
+    "data/dmv_entries_04.csv",
+    "data/dmv_entries_05.csv",
+    "data/dmv_entries_06.csv",
+    "data/dmv_entries_07.csv",
+    "data/dmv_entries_08.csv",
+    "data/dmv_entries_09.csv",
+    "data/dmv_entries_10.csv",
+    "data/dmv_entries_11.csv",
+    "data/dmv_entries_12.csv",
+    "data/dmv_entries_13.csv",
+    "data/dmv_entries_14.csv",
+    "data/dmv_entries_15.csv",
+    "data/dmv_entries_16.csv"
+  ]
 }
