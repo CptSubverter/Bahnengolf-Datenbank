@@ -41,7 +41,7 @@ Der geprüfte kanonische Shard-Bestand ist als `DRL_CANONICAL_SHARDS_213155.zip`
 
 Die Prüfinformationen zu allen acht Shards sind in `data/drl_release_package.json` dokumentiert.
 
-Die eigentlichen acht JSON-Shards sind derzeit noch nicht vollständig im öffentlichen Repository veröffentlicht. Deshalb bleibt `public_drl_shards` bewusst auf `false`. Es wird kein unvollständiger oder abgeschnittener Shard veröffentlicht.
+Die acht JSON-Shards sind jetzt vollständig im öffentlichen Repository unter `data/` veröffentlicht. Zusammen enthalten sie **213.155 Datensätze**. Der veröffentlichte Bestand wurde vor der Veröffentlichung auf Vollständigkeit geprüft.
 
 ## Projektziel
 
