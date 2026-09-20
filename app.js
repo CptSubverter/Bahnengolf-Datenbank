@@ -120,11 +120,11 @@ async function renderDetail(){
       historyTable("Turnierteilnahmen",d.results.map(r=>({
       tournament_id:r.tournament_id,
       tournament_name:entityName("tournaments",r.tournament_id)||r.tournament_name||"—",
-      date:r.date||"",
-      location:r.location||"",
-      category:r.category||"",
-      place:r.place||"",
-      score:r.score||r.total_score||r.result||""
+      date:(DATA.tournaments.find(t=>String(t.tournament_id)===String(r.tournament_id))||{}).date||r.date||"",
+      location:(DATA.tournaments.find(t=>String(t.tournament_id)===String(r.tournament_id))||{}).location||r.location||"",
+      category:r.category||"—",
+      place:r.place||"—",
+      score:r.total_score||r.score||r.result||"—"
     })))+historyTable("Rundenergebnisse",d.rounds)+historyTable("DRL",d.drl)+historyTable("DMV",d.dmv);
   } else if(v==="clubs"){
     title=d.club.canonical_name;
