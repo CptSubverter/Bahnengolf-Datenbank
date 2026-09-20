@@ -113,7 +113,13 @@ function relatedRows(v,obj){
 }
 
 function renderStats(){const defs=[["players","Spieler"],["clubs","Vereine"],["associations","Verbände"],["tournaments","Turniere"],["results","Ergebnisse"],["rounds","Runden"],["drl","DRL"],["dmv","DMV"]];$("#stats").innerHTML=defs.map(([k,l])=>'<button class="stat" onclick="setView(\''+k+'\')"><b>'+DATA[k].length.toLocaleString("de-DE")+'</b><span>'+l+'</span></button>').join("")}
-function renderStatus(){const d=DRL_STATUS,m=DMV_STATUS;$("#drl-status").innerHTML=(DATA_ERRORS.length?'<div class="drl-status warn"><b>Ladefehler:</b> '+esc(DATA_ERRORS.slice(0,4).join(" · "))+"</div>": "")+'<div class="drl-status +(d.loaded&&d.rows===d.expected?"ok":"warn")+'"><b>DRL:</b> '+d.rows.toLocaleString("de-DE")+' / 213.155 · '+d.shards+'/8 Shards</div><div class="drl-status '+(m.loaded&&m.rows===m.expected?"ok":"warn")+'"><b>DMV:</b> '+m.rows.toLocaleString("de-DE")+' / 156.744 · '+m.shards+'/16 Shards</div>'}
+function renderStatus(){
+  const d=DRL_STATUS,m=DMV_STATUS;
+  const errors=DATA_ERRORS.length?'<div class="drl-status warn"><b>Ladefehler:</b> '+esc(DATA_ERRORS.slice(0,4).join(" · "))+'</div>':"";
+  $("#drl-status").innerHTML=errors
+    +'<div class="drl-status '+(d.loaded&&d.rows===d.expected?"ok":"warn")+'"><b>DRL:</b> '+d.rows.toLocaleString("de-DE")+' / 213.155 · '+d.shards+'/8 Shards</div>'
+    +'<div class="drl-status '+(m.loaded&&m.rows===m.expected?"ok":"warn")+'"><b>DMV:</b> '+m.rows.toLocaleString("de-DE")+' / 156.744 · '+m.shards+'/16 Shards</div>';
+}
 function renderCoverage(){const s=relationSummary(),rows=[["Spieler → Verein",s.playersClubs,DATA.players.length],["Spieler → Verband",s.playersAssociations,DATA.players.length],["Verein → Verband",s.clubAssociations,DATA.clubs.length],["Ergebnis → Spieler",s.resultPlayers,DATA.results.length],["Ergebnis → Turnier",s.resultTournaments,DATA.results.length],["Ergebnis → Verein",s.resultClubs,DATA.results.length],["Runde → Ergebnis",s.roundsResults,DATA.rounds.length],["Runde → Spieler",s.roundPlayers,DATA.rounds.length],["Runde → Turnier",s.roundTournaments,DATA.rounds.length],["DRL → Spieler",s.drlPlayers,DATA.drl.length],["DMV → Spieler",s.dmvPlayers,DATA.dmv.length]];$("#relation-coverage").innerHTML=rows.map(x=>'<div class="coverage-card"><span>'+esc(x[0])+'</span><b>'+x[1].toLocaleString("de-DE")+' / '+x[2].toLocaleString("de-DE")+'</b><small>'+((x[2]?x[1]/x[2]*100:100).toFixed(1))+' %</small></div>').join("")}
 function rowMatches(o){const q=norm(state.q);return !q||Object.values(o).some(v=>norm(v).includes(q))}
 function viewForField(c){return ({player_id:"players",club_id:"clubs",association_id:"associations",tournament_id:"tournaments",result_id:"results",round_id:"rounds",drl_entry_id:"drl",dmv_entry_id:"dmv"})[c]}
