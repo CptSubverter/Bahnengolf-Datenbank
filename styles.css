@@ -24,3 +24,26 @@ details summary{cursor:pointer;font-weight:700;color:#2fa7fa}
 .drl-status{margin:6px 0;padding:8px 12px;border-radius:8px}
 .drl-status.ok{border:1px solid #2fa7fa}
 .drl-status.warn{border:1px solid #d89b32}
+
+/* Mobile polish */
+@media(max-width:800px){
+  .wrap{padding:0 12px}
+  .topin{padding-top:22px;padding-bottom:20px}
+  .top p{font-size:14px;max-width:290px}
+  .searchbox{margin:14px 0;padding:12px}
+  .quick{gap:6px}
+  .quick button{flex:1 1 calc(33.333% - 6px);min-width:92px;padding:8px 7px}
+  .coverage-panel{padding:12px;margin:10px 0}
+  .coverage-panel h2{font-size:17px}
+  .coverage-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;max-height:250px;overflow:auto}
+  .coverage-card{padding:8px}
+  .coverage-card b{font-size:12px}
+  .coverage-card small{font-size:11px}
+  .layout{gap:10px}
+  .nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;padding:8px}
+  .navbtn{width:100%;margin:0;text-align:center;padding:9px 6px}
+  .content{padding:12px}
+  .sectionhead h2{font-size:20px}
+  .tablebox{max-width:100%}
+  table{min-width:560px}
+}
