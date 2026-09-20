@@ -54,12 +54,12 @@ jobs:
 
           with (out/"results.csv").open("w",encoding="utf-8",newline="") as f:
               w=csv.writer(f)
-              w.writerow(["result_id","player_id","tournament_id","club_id","place","total_score","average","identity_status","source"])
+              w.writerow(["result_id","player_id","tournament_id","club_id","place","total_score","average","category","identity_status","source"])
               for r in rows:
                   code=r.get("tournament_code") or r.get("tournament_id") or ""
                   pid=players.get(str(r.get("pass","")),"")
                   status="pass_verified" if pid else "unresolved_identity"
-                  w.writerow([result_id(r),pid,code,"","",r.get("total",""),r.get("average",""),status,r.get("source","")])
+                  w.writerow([result_id(r),pid,code,"","",r.get("total",""),r.get("average",""),r.get("category",""),status,r.get("source","")])
 
           with (out/"rounds.csv").open("w",encoding="utf-8",newline="") as f:
               w=csv.writer(f)
