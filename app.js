@@ -159,10 +159,12 @@ function renderSearchResults(q){
   const box=$("#search-results");
   if(!q){box.innerHTML="";return}
   const map={player:"players",club:"clubs",association:"associations",tournament:"tournaments"};
-  box.innerHTML=searchEntities(q).map(x=>{
-    const v=map[x.type]||x.type;
-    return '<button onclick="openItem('+JSON.stringify(v)+','+JSON.stringify(x.id)+')">'+esc(x.label)+' <small>('+esc(x.type)+')</small></button>'
-  }).join("")
+  const hits=searchEntities(q);
+  box.innerHTML='<div class="search-results-title">'+hits.length.toLocaleString("de-DE")+' Suchergebnisse</div>'+
+    (hits.length?hits.map(x=>{
+      const v=map[x.type]||x.type;
+      return '<button type="button" class="search-hit" data-open-type="'+esc(v)+'" data-open-id="'+esc(String(x.id))+'"><span>'+esc(x.label)+'</span><small>'+esc(x.type==="player"?"Spieler":x.type==="club"?"Verein":x.type==="association"?"Verband":"Turnier")+'</small></button>'
+    }).join(""):'<div class="search-empty">Keine passenden Datensätze gefunden.</div>');
 }
 document.querySelectorAll("[data-view]").forEach(b=>b.onclick=()=>setView(b.dataset.view));
 document.addEventListener("click",e=>{const b=e.target.closest("[data-open-type][data-open-id]");if(b){e.preventDefault();openItem(b.dataset.openType,b.dataset.openId)}});
