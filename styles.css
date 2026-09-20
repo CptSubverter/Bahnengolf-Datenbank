@@ -55,3 +55,5 @@ details summary{cursor:pointer;font-weight:700;color:#2fa7fa}
   .topin{gap:10px}
   .iconbtn{flex:0 0 auto}
 }
+
+.search-results-title{padding:8px 12px;font-weight:700;color:var(--accent);border-bottom:1px solid var(--line)}.search-hit{display:flex;align-items:center;justify-content:space-between;width:100%;padding:10px 12px;background:var(--panel);border:0;border-bottom:1px solid var(--line);color:var(--text);text-align:left;cursor:pointer}.search-hit:hover{background:var(--panel2)}.search-hit span{font-weight:600}.search-hit small{color:var(--muted);margin-left:12px}.search-empty{padding:12px;color:var(--muted)}
