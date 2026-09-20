@@ -39,6 +39,11 @@ function entityName(type,id){
 }
 function fieldValue(o,c){
   const v=o[c]; if(v==null||v==="")return "—";
+  if(c==="name" && o.player_id)return link("players",o.player_id,v);
+  if(c==="canonical_name" && o.club_id)return link("clubs",o.club_id,v);
+  if(c==="association_name" && o.association_id)return link("associations",o.association_id,v);
+  if(c==="tournament_name" && o.tournament_id)return link("tournaments",o.tournament_id,v);
+  if(c==="pass_number" && o.player_id)return link("players",o.player_id,v);
   if(TYPE_BY_ID[c]){
     const type=TYPE_BY_ID[c], name=entityName(type,v);
     return link(type,v,name||v);
