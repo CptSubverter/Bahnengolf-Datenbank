@@ -117,7 +117,15 @@ async function renderDetail(){
     const p=d.player; title=p.name;
     body='<div class="history-links"><button type="button" class="secondary" onclick="setView(\'players\')">← Zurück zu Spielern</button></div>'+'<div class="history-links"><b>Verein:</b> '+(p.current_club_id?link("clubs",p.current_club_id,entityName("clubs",p.current_club_id)):"—")+' · <b>Verband:</b> '+(p.current_association_id?link("associations",p.current_association_id,entityName("associations",p.current_association_id)):"—")+' · <b>Passnummer:</b> '+esc(p.pass_number||"—")+'</div>'+
       '<div class="history-links"><b>Ergebnisse:</b> '+d.results.length+' · <b>Runden:</b> '+d.rounds.length+' · <b>DRL:</b> '+d.drl.length+' · <b>DMV:</b> '+d.dmv.length+'</div>'+
-      historyTable("Ergebnisse",d.results)+historyTable("Runden",d.rounds)+historyTable("DRL",d.drl)+historyTable("DMV",d.dmv);
+      historyTable("Turnierteilnahmen",d.results.map(r=>({
+      tournament_id:r.tournament_id,
+      tournament_name:entityName("tournaments",r.tournament_id)||r.tournament_name||"—",
+      date:r.date||"",
+      location:r.location||"",
+      category:r.category||"",
+      place:r.place||"",
+      score:r.score||r.total_score||r.result||""
+    })))+historyTable("Rundenergebnisse",d.rounds)+historyTable("DRL",d.drl)+historyTable("DMV",d.dmv);
   } else if(v==="clubs"){
     title=d.club.canonical_name;
     body='<div class="history-links"><b>Verband:</b> '+(d.club.association_id?link("associations",d.club.association_id,entityName("associations",d.club.association_id)):"—")+' · <b>Spieler:</b> '+d.player_ids.length+'</div>'+
