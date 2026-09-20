@@ -1,4 +1,4 @@
-name: Build canonical tournament results
+name: Build canonical tournament results # synchronized
 
 on:
   workflow_dispatch:
