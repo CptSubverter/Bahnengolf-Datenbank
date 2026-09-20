@@ -100,11 +100,14 @@ async function render(){
   rows=filterRows(rows);$("#count").textContent=rows.length.toLocaleString("de-DE")+" Datensätze";$("#detail").innerHTML="";renderTable(rows,state.view);
 }
 function renderSearchResults(q){
-  const box=$("#search-results"); if(!q){box.innerHTML="";return}
-  box.innerHTML=searchEntities(q).map(x=>'<button onclick="openItem('+JSON.stringify(x.type)+','+JSON.stringify(x.id)+')">'+esc(x.label)+' <small>('+esc(x.type)+')</small></button>').join("")
+  const box=$("#search-results");
+  if(!q){box.innerHTML="";return}
+  const map={player:"players",club:"clubs",association:"associations",tournament:"tournaments"};
+  box.innerHTML=searchEntities(q).map(x=>{
+    const v=map[x.type]||x.type;
+    return '<button onclick="openItem('+JSON.stringify(v)+','+JSON.stringify(x.id)+')">'+esc(x.label)+' <small>('+esc(x.type)+')</small></button>'
+  }).join("")
 }
-$("#search").addEventListener("input",e=>{state.q=e.target.value;state.detail=null;render();renderSearchResults(e.target.value)});
-$("#clear").onclick=()=>{state.q="";$("#search").value="";state.detail=null;render();renderSearchResults("")};
 document.querySelectorAll("[data-view]").forEach(b=>b.onclick=()=>setView(b.dataset.view));
 $("#themeBtn").onclick=()=>document.body.classList.toggle("light");
 (async()=>{try{await loadBase();render()}catch(e){renderStatus(false,e.message);$("#title").textContent="Datenbank konnte nicht geladen werden";$("#detail").innerHTML='<div class="empty">Die Webdaten sind noch nicht veröffentlicht oder konnten nicht geladen werden.</div>'}})();
