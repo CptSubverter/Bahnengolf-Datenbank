@@ -30,6 +30,18 @@ jobs:
         with:
           enablement: true
 
+      - name: Build indexed web database
+        run: python3 scripts/build_web_database.py
+      - name: Validate indexed web database
+        run: |
+          python3 - <<'PY'
+          import json
+          m=json.load(open("web/manifest.json",encoding="utf-8"))
+          expected={"players":6438,"clubs":402,"associations":13,"tournaments":2633,"results":27501,"rounds":114777,"drl":213155,"dmv":156744}
+          assert m["counts"]==expected, (m["counts"], expected)
+          assert m["status"]=="web_database_build_verified"
+          print("WEB DATABASE VALIDATION OK")
+          PY
       - name: Upload site
         uses: actions/upload-pages-artifact@v4
         with:
