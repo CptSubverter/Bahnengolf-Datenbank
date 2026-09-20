@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import csv, json, os, glob, hashlib
+import csv, json, os, glob
 from collections import defaultdict
 
 ROOT="."
@@ -109,7 +109,7 @@ for c in club_index:
 for a in assoc_index:
     aid=str(a["association_id"]); dump(os.path.join(OUT,"associations",f"{aid}.json"),{"association":a,"player_ids":by_assoc_players.get(aid,[]),"club_ids":by_assoc_clubs.get(aid,[])})
 for t in tour_index:
-    tid=str(t["tournament_id"]); b=hashlib.sha1(tid.encode()).hexdigest()[:2]
+    tid=str(t["tournament_id"]); b=f"{sum((i+1)*ord(ch) for i,ch in enumerate(tid))%256:02x}"
     path=os.path.join(OUT,"tournaments",f"{b}.json")
     existing={}
     if os.path.exists(path):
