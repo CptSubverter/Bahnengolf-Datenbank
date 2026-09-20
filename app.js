@@ -16,14 +16,84 @@ function norm(s){return String(s??"").toLocaleLowerCase("de-DE").trim()}
 function rebuildIndexes(){Object.keys(DATA).forEach(v=>INDEX[v]=new Map((DATA[v]||[]).map(o=>[String(ident(o)),o])))}
 function findById(v,k){return INDEX[v]?.get(String(k))}
 function link(v,k,t){return '<button class="link" onclick="openItem('+JSON.stringify(v)+','+JSON.stringify(String(k))+')">'+esc(t||k)+'</button>'}
-function setView(v){state={view:v,q:"",detail:null};$("#search").value="";render()}
+function setView(v){state={view:v,q:"",detail:null};$("#search").value="";document.querySelectorAll("[data-view]").forEach(b=>b.classList.toggle("active",b.dataset.view===v));render()}
 function openItem(v,k){state={view:v,q:"",detail:String(k)};$("#search").value="";render()}
 async function loadCSV(key,url){try{const r=await fetch(url,{cache:"no-store"});if(r.ok)DATA[key]=parseCSV(await r.text())}catch(e){}}
 async function loadDRL(){let all=[],loaded=0;try{const r=await fetch(DRL_OVERRIDE_URL,{cache:"no-store"});if(r.ok){const x=await r.json();DRL_OVERRIDES=Object.fromEntries((x.overrides||[]).map(v=>[String(v.historical_pass_number),v.player_id]))}}catch(e){}const rs=await Promise.all(DRL_SHARDS.map(u=>fetch(u,{cache:"no-store"}).then(r=>r.ok?r.json():[]).catch(()=>[])));rs.forEach(x=>{const rows=Array.isArray(x)?x:(x.rows||[]);if(rows.length){all.push(...rows);loaded++}});all.forEach(r=>{if(!r.player_id&&DRL_OVERRIDES[String(r.pass_number)])r.player_id=DRL_OVERRIDES[String(r.pass_number)]});DATA.drl=all;DRL_STATUS={loaded:loaded===8,shards:loaded,rows:all.length,expected:213155}}
 async function loadDMV(){const rs=await Promise.all(DMV_SHARDS.map(u=>fetch(u,{cache:"no-store"}).then(async r=>r.ok?parseCSV(await r.text()):[]).catch(()=>[])));const all=rs.flat();DATA.dmv=all;const loaded=rs.filter(x=>x.length).length;DMV_STATUS={loaded:loaded===16,shards:loaded,rows:all.length,expected:156744}}
 function relationSummary(){const p=DATA.players,c=DATA.clubs,a=DATA.associations,r=DATA.results,ro=DATA.rounds,d=DATA.drl,m=DATA.dmv;return{playersClubs:p.filter(x=>x.current_club_id&&findById("clubs",x.current_club_id)).length,playersAssociations:p.filter(x=>x.current_association_id&&findById("associations",x.current_association_id)).length,clubAssociations:c.filter(x=>x.association_id&&findById("associations",x.association_id)).length,resultPlayers:r.filter(x=>x.player_id&&findById("players",x.player_id)).length,resultTournaments:r.filter(x=>x.tournament_id&&findById("tournaments",x.tournament_id)).length,resultClubs:r.filter(x=>x.club_id&&findById("clubs",x.club_id)).length,roundsResults:ro.filter(x=>x.result_id&&findById("results",x.result_id)).length,roundPlayers:ro.filter(x=>x.player_id&&findById("players",x.player_id)).length,roundTournaments:ro.filter(x=>x.tournament_id&&findById("tournaments",x.tournament_id)).length,drlPlayers:d.filter(x=>x.player_id&&findById("players",x.player_id)).length,dmvPlayers:m.filter(x=>x.player_id&&findById("players",x.player_id)).length}}
 function relationHealth(){const s=relationSummary(),checks=[["Spieler → Verein",s.playersClubs,DATA.players.length],["Spieler → Verband",s.playersAssociations,DATA.players.length],["Verein → Verband",s.clubAssociations,DATA.clubs.length],["Ergebnis → Spieler",s.resultPlayers,DATA.results.length],["Ergebnis → Turnier",s.resultTournaments,DATA.results.length],["Ergebnis → Verein",s.resultClubs,DATA.results.length],["Runde → Ergebnis",s.roundsResults,DATA.rounds.length],["Runde → Spieler",s.roundPlayers,DATA.rounds.length],["Runde → Turnier",s.roundTournaments,DATA.rounds.length],["DRL → Spieler",s.drlPlayers,DATA.drl.length],["DMV → Spieler",s.dmvPlayers,DATA.dmv.length]];const total=checks.reduce((a,x)=>a+x[2],0),linked=checks.reduce((a,x)=>a+x[1],0);return{checks,total,linked,open:total-linked}}
-function relatedRows(v,obj){const id=String(ident(obj)||"");const p=String(obj.player_id||""),t=String(obj.tournament_id||""),cl=String(obj.club_id||""),res=String(obj.result_id||"");if(v==="players")return DATA.players.filter(x=>(p&&String(x.player_id)===p)||(state.view==="clubs"&&cl&&String(x.current_club_id)===cl)||(state.view==="associations"&&String(x.current_association_id)===id));if(v==="clubs")return DATA.clubs.filter(x=>(cl&&String(x.club_id)===cl)||(state.view==="players"&&String(x.club_id||x.current_club_id)===String(obj.current_club_id||obj.club_id))||(state.view==="associations"&&String(x.association_id)===id));if(v==="associations")return DATA.associations.filter(x=>String(x.association_id)===String(obj.association_id||obj.current_association_id));if(v==="tournaments")return DATA.tournaments.filter(x=>(t&&String(x.tournament_id)===t)||(state.view==="results"&&String(x.tournament_id)===t)||(state.view==="rounds"&&String(x.tournament_id)===t));if(v==="results")return DATA.results.filter(x=>(res&&String(x.result_id)===res)||(p&&String(x.player_id)===p)||(t&&String(x.tournament_id)===t)||(state.view==="rounds"&&String(x.result_id)===String(obj.result_id||"")));if(v==="rounds")return DATA.rounds.filter(x=>(p&&String(x.player_id)===p)||(res&&String(x.result_id)===res)||(t&&String(x.tournament_id)===t));if(v==="drl")return DATA.drl.filter(x=>(p&&String(x.player_id)===p)||(String(x.pass_number||"")===String(obj.pass_number||"")));if(v==="dmv")return DATA.dmv.filter(x=>(p&&String(x.player_id)===p)||(String(x.pass_number||"")===String(obj.pass_number||"")));return[]}
+function relatedRows(v,obj){
+  const id=String(ident(obj)||""), p=String(obj.player_id||""), t=String(obj.tournament_id||""), cl=String(obj.club_id||""), res=String(obj.result_id||"");
+  const playerIdsFor=(contextView,contextObj)=>{
+    if(contextView==="players") return new Set([String(contextObj.player_id||"")]);
+    if(contextView==="clubs") return new Set(DATA.players.filter(x=>String(x.current_club_id||"")===String(contextObj.club_id||"")).map(x=>String(x.player_id)));
+    if(contextView==="associations") return new Set(DATA.players.filter(x=>String(x.current_association_id||"")===String(contextObj.association_id||"")).map(x=>String(x.player_id)));
+    if(contextView==="tournaments"){
+      const tid=String(contextObj.tournament_id||"");
+      return new Set([...DATA.results.filter(x=>String(x.tournament_id||"")===tid).map(x=>x.player_id),...DATA.rounds.filter(x=>String(x.tournament_id||"")===tid).map(x=>x.player_id)].filter(Boolean).map(String));
+    }
+    if(contextView==="results"||contextView==="rounds") return new Set(p?[p]:[]);
+    return new Set();
+  };
+  const pids=playerIdsFor(state.view,obj);
+  if(v==="players") return pids.size ? DATA.players.filter(x=>pids.has(String(x.player_id))) : [];
+  if(v==="clubs"){
+    if(state.view==="players") return DATA.clubs.filter(x=>String(x.club_id||"")===String(obj.current_club_id||""));
+    if(state.view==="associations") return DATA.clubs.filter(x=>String(x.association_id||"")===id);
+    if(pids.size) return DATA.clubs.filter(x=>[...pids].some(pid=>String(findById("players",pid)?.current_club_id||"")===String(x.club_id||"")));
+    if(cl) return DATA.clubs.filter(x=>String(x.club_id)===cl);
+    return [];
+  }
+  if(v==="associations"){
+    if(state.view==="players") return DATA.associations.filter(x=>String(x.association_id||"")===String(obj.current_association_id||""));
+    if(state.view==="clubs") return DATA.associations.filter(x=>String(x.association_id||"")===String(obj.association_id||""));
+    if(pids.size){
+      const aids=new Set([...pids].map(pid=>findById("players",pid)?.current_association_id).filter(Boolean).map(String));
+      return DATA.associations.filter(x=>aids.has(String(x.association_id)));
+    }
+    return [];
+  }
+  if(v==="tournaments"){
+    const tids=new Set();
+    if(state.view==="results"||state.view==="rounds"){ if(t) tids.add(t); }
+    else if(state.view==="players"){
+      DATA.results.filter(x=>String(x.player_id)===String(obj.player_id)).forEach(x=>x.tournament_id&&tids.add(String(x.tournament_id)));
+      DATA.rounds.filter(x=>String(x.player_id)===String(obj.player_id)).forEach(x=>x.tournament_id&&tids.add(String(x.tournament_id)));
+    } else if(state.view==="clubs"||state.view==="associations"){
+      const ids=playerIdsFor(state.view,obj);
+      DATA.results.filter(x=>ids.has(String(x.player_id))&&x.tournament_id).forEach(x=>tids.add(String(x.tournament_id)));
+      DATA.rounds.filter(x=>ids.has(String(x.player_id))&&x.tournament_id).forEach(x=>tids.add(String(x.tournament_id)));
+    }
+    return DATA.tournaments.filter(x=>tids.has(String(x.tournament_id)));
+  }
+  if(v==="results"){
+    if(state.view==="players") return DATA.results.filter(x=>String(x.player_id)===String(obj.player_id));
+    if(state.view==="tournaments") return DATA.results.filter(x=>String(x.tournament_id)===String(obj.tournament_id));
+    if(state.view==="rounds") return DATA.results.filter(x=>String(x.result_id)===String(obj.result_id));
+    if(state.view==="clubs"||state.view==="associations"){ const ids=playerIdsFor(state.view,obj); return DATA.results.filter(x=>ids.has(String(x.player_id))||String(x.club_id||"")===String(obj.club_id||"")); }
+    if(res) return DATA.results.filter(x=>String(x.result_id)===res);
+    return [];
+  }
+  if(v==="rounds"){
+    if(state.view==="players") return DATA.rounds.filter(x=>String(x.player_id)===String(obj.player_id));
+    if(state.view==="results") return DATA.rounds.filter(x=>String(x.result_id)===String(obj.result_id));
+    if(state.view==="tournaments") return DATA.rounds.filter(x=>String(x.tournament_id)===String(obj.tournament_id));
+    if(state.view==="clubs"||state.view==="associations"){ const ids=playerIdsFor(state.view,obj); return DATA.rounds.filter(x=>ids.has(String(x.player_id))); }
+    return [];
+  }
+  if(v==="drl"){
+    if(state.view==="players") return DATA.drl.filter(x=>String(x.player_id)===String(obj.player_id)||String(x.pass_number||"")===String(obj.pass_number||""));
+    if(pids.size) return DATA.drl.filter(x=>pids.has(String(x.player_id)));
+    return [];
+  }
+  if(v==="dmv"){
+    if(state.view==="players") return DATA.dmv.filter(x=>String(x.player_id)===String(obj.player_id)||String(x.pass_number||"")===String(obj.pass_number||""));
+    if(pids.size) return DATA.dmv.filter(x=>pids.has(String(x.player_id)));
+    return [];
+  }
+  return [];
+}
 
 function renderStats(){const defs=[["players","Spieler"],["clubs","Vereine"],["associations","Verbände"],["tournaments","Turniere"],["results","Ergebnisse"],["rounds","Runden"],["drl","DRL"],["dmv","DMV"]];$("#stats").innerHTML=defs.map(([k,l])=>'<button class="stat" onclick="setView(\''+k+'\')"><b>'+DATA[k].length.toLocaleString("de-DE")+'</b><span>'+l+'</span></button>').join("")}
 function renderStatus(){const d=DRL_STATUS,m=DMV_STATUS;$("#drl-status").innerHTML='<div class="drl-status '+(d.loaded&&d.rows===d.expected?"ok":"warn")+'"><b>DRL:</b> '+d.rows.toLocaleString("de-DE")+' / 213.155 · '+d.shards+'/8 Shards</div><div class="drl-status '+(m.loaded&&m.rows===m.expected?"ok":"warn")+'"><b>DMV:</b> '+m.rows.toLocaleString("de-DE")+' / 156.744 · '+m.shards+'/16 Shards</div>'}
