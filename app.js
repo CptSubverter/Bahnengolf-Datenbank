@@ -1,140 +1,110 @@
-const DATA={players:[],clubs:[],associations:[],tournaments:[],results:[],rounds:[],drl:[],dmv:[]};
-const INDEX={};
+const DATA={players:[],clubs:[],associations:[],tournaments:[]};
 let state={view:"players",q:"",detail:null};
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const DATA_ROOT="./data/";
-const RAW_DATA_ROOT="https://raw.githubusercontent.com/CptSubverter/Bahnengolf-Datenbank/main/data/";
-const SOURCES={players:RAW_DATA_ROOT+"players.csv",clubs:RAW_DATA_ROOT+"clubs.csv",associations:RAW_DATA_ROOT+"associations.csv",tournaments:RAW_DATA_ROOT+"tournaments.csv",results:RAW_DATA_ROOT+"results.csv",rounds:RAW_DATA_ROOT+"rounds.csv"};
-const DMV_SHARDS=Array.from({length:16},(_,i)=>RAW_DATA_ROOT+`dmv_entries_${String(i+1).padStart(2,"0")}.csv`);
-const DRL_SHARDS=Array.from({length:8},(_,i)=>DATA_ROOT+`drl_entries_${String(i+1).padStart(2,"0")}.json`);
-const DRL_OVERRIDE_URL=DATA_ROOT+"drl_identity_overrides.json";
-let DRL_OVERRIDES={},DRL_STATUS={loaded:false,shards:0,rows:0,expected:213155},DMV_STATUS={loaded:false,shards:0,rows:0,expected:156744};
-const DATA_ERRORS=[];
-async function loadText(url){
-  try{
-    const r=await fetch(url,{cache:"no-store",credentials:"same-origin"});
-    if(!r.ok) throw new Error("HTTP "+r.status);
-    return await r.text();
-  }catch(fetchErr){
-    return await new Promise((resolve,reject)=>{
-      const x=new XMLHttpRequest();
-      x.open("GET",url,true);
-      x.onload=()=>x.status>=200&&x.status<300?resolve(x.responseText):reject(new Error("HTTP "+x.status+" / "+fetchErr.message));
-      x.onerror=()=>reject(new Error("XHR fehlgeschlagen / "+fetchErr.message));
-      x.send();
-    });
-  }
+const WEB="./web/";
+let MANIFEST=null,SEARCH=[];
+const CACHE=new Map();
+async function getJSON(url){
+  if(CACHE.has(url)) return CACHE.get(url);
+  const p=fetch(url,{cache:"no-store"}).then(r=>{if(!r.ok)throw new Error("HTTP "+r.status+" "+url);return r.json()});
+  CACHE.set(url,p); return p;
 }
-function parseCSV(t){const rows=[];let row=[],cell="",quoted=false;for(let i=0;i<t.length;i++){const c=t[i],n=t[i+1];if(c==='"'&&quoted&&n==='"'){cell+='"';i++;continue}if(c==='"'){quoted=!quoted;continue}if(c===','&&!quoted){row.push(cell);cell="";continue}if((c==="\n"||c==="\r")&&!quoted){if(c==="\r"&&n==="\n")i++;row.push(cell);cell="";continue}cell+=c}if(cell||row.length){row.push(cell);if(row.some(x=>x.trim()))rows.push(row)}if(!rows.length)return[];const h=rows.shift().map(x=>x.trim());return rows.map(r=>Object.fromEntries(h.map((k,i)=>[k,(r[i]??"").trim()])))}
-function val(o,...keys){for(const k of keys)if(o?.[k]!=null&&o[k]!=="")return o[k];return""}
-function ident(o){return val(o,"player_id","club_id","association_id","tournament_id","result_id","round_id","drl_entry_id","dmv_entry_id","id")}
-function label(o){return val(o,"name","canonical_name","player_name","club_name","tournament_name","association_name","original_name","normalized_name")||ident(o)}
-function norm(s){return String(s??"").toLocaleLowerCase("de-DE").trim()}
-function rebuildIndexes(){Object.keys(DATA).forEach(v=>INDEX[v]=new Map((DATA[v]||[]).map(o=>[String(ident(o)),o])))}
-function findById(v,k){return INDEX[v]?.get(String(k))}
+function norm(s){return String(s??"").toLocaleLowerCase("de-DE").normalize("NFD").replace(/[\u0300-\u036f]/g,"").trim()}
+function label(o){return o?.name||o?.canonical_name||o?.player_name||o?.club_name||o?.tournament_name||o?.association_name||o?.label||o?.id||""}
+function ident(o){return String(o?.player_id||o?.club_id||o?.association_id||o?.tournament_id||o?.result_id||o?.round_id||o?.drl_entry_id||o?.dmv_entry_id||o?.id||"")}
 function link(v,k,t){return '<button class="link" onclick="openItem('+JSON.stringify(v)+','+JSON.stringify(String(k))+')">'+esc(t||k)+'</button>'}
 function setView(v){state={view:v,q:"",detail:null};$("#search").value="";document.querySelectorAll("[data-view]").forEach(b=>b.classList.toggle("active",b.dataset.view===v));render()}
 function openItem(v,k){state={view:v,q:"",detail:String(k)};$("#search").value="";render()}
-async function loadCSV(key,url){try{const text=await loadText(url);const rows=parseCSV(text);DATA[key]=rows;if(!rows.length)throw new Error("0 Datensätze")}catch(e){DATA_ERRORS.push(key+": "+e.message);console.error("Datenquelle konnte nicht geladen werden:",key,url,e)}}
-async function loadDRL(){let all=[],loaded=0;try{const text=await loadText(DRL_OVERRIDE_URL);if(text){const x=JSON.parse(text);DRL_OVERRIDES=Object.fromEntries((x.overrides||[]).map(v=>[String(v.historical_pass_number),v.player_id]))}}catch(e){console.warn("DRL-Overrides nicht geladen",e)}for(const u of DRL_SHARDS){try{const text=await loadText(u);const x=JSON.parse(text);const rows=Array.isArray(x)?x:(x.rows||[]);if(rows.length){all.push(...rows);loaded++}}catch(e){DATA_ERRORS.push("DRL "+u.split("/").pop()+": "+e.message);console.error("DRL-Shard nicht geladen",u,e)}}all.forEach(r=>{if(!r.player_id&&DRL_OVERRIDES[String(r.pass_number)])r.player_id=DRL_OVERRIDES[String(r.pass_number)]});DATA.drl=all;DRL_STATUS={loaded:loaded===8,shards:loaded,rows:all.length,expected:213155}}
-async function loadDMV(){const all=[];let loaded=0;for(const u of DMV_SHARDS){try{const text=await loadText(u);const rows=parseCSV(text);if(rows.length){all.push(...rows);loaded++}}catch(e){DATA_ERRORS.push("DMV "+u.split("/").pop()+": "+e.message);console.error("DMV-Shard nicht geladen",u,e)}}DATA.dmv=all;DMV_STATUS={loaded:loaded===16,shards:loaded,rows:all.length,expected:156744}}
-function relationSummary(){const p=DATA.players,c=DATA.clubs,a=DATA.associations,r=DATA.results,ro=DATA.rounds,d=DATA.drl,m=DATA.dmv;return{playersClubs:p.filter(x=>x.current_club_id&&findById("clubs",x.current_club_id)).length,playersAssociations:p.filter(x=>x.current_association_id&&findById("associations",x.current_association_id)).length,clubAssociations:c.filter(x=>x.association_id&&findById("associations",x.association_id)).length,resultPlayers:r.filter(x=>x.player_id&&findById("players",x.player_id)).length,resultTournaments:r.filter(x=>x.tournament_id&&findById("tournaments",x.tournament_id)).length,resultClubs:r.filter(x=>x.club_id&&findById("clubs",x.club_id)).length,roundsResults:ro.filter(x=>x.result_id&&findById("results",x.result_id)).length,roundPlayers:ro.filter(x=>x.player_id&&findById("players",x.player_id)).length,roundTournaments:ro.filter(x=>x.tournament_id&&findById("tournaments",x.tournament_id)).length,drlPlayers:d.filter(x=>x.player_id&&findById("players",x.player_id)).length,dmvPlayers:m.filter(x=>x.player_id&&findById("players",x.player_id)).length}}
-function relationHealth(){const s=relationSummary(),checks=[["Spieler → Verein",s.playersClubs,DATA.players.length],["Spieler → Verband",s.playersAssociations,DATA.players.length],["Verein → Verband",s.clubAssociations,DATA.clubs.length],["Ergebnis → Spieler",s.resultPlayers,DATA.results.length],["Ergebnis → Turnier",s.resultTournaments,DATA.results.length],["Ergebnis → Verein",s.resultClubs,DATA.results.length],["Runde → Ergebnis",s.roundsResults,DATA.rounds.length],["Runde → Spieler",s.roundPlayers,DATA.rounds.length],["Runde → Turnier",s.roundTournaments,DATA.rounds.length],["DRL → Spieler",s.drlPlayers,DATA.drl.length],["DMV → Spieler",s.dmvPlayers,DATA.dmv.length]];const total=checks.reduce((a,x)=>a+x[2],0),linked=checks.reduce((a,x)=>a+x[1],0);return{checks,total,linked,open:total-linked}}
-function relatedRows(v,obj){
-  const id=String(ident(obj)||""), p=String(obj.player_id||""), t=String(obj.tournament_id||""), cl=String(obj.club_id||""), res=String(obj.result_id||"");
-  const playerIdsFor=(contextView,contextObj)=>{
-    if(contextView==="players") return new Set([String(contextObj.player_id||"")]);
-    if(contextView==="clubs") return new Set(DATA.players.filter(x=>String(x.current_club_id||"")===String(contextObj.club_id||"")).map(x=>String(x.player_id)));
-    if(contextView==="associations") return new Set(DATA.players.filter(x=>String(x.current_association_id||"")===String(contextObj.association_id||"")).map(x=>String(x.player_id)));
-    if(contextView==="tournaments"){
-      const tid=String(contextObj.tournament_id||"");
-      return new Set([...DATA.results.filter(x=>String(x.tournament_id||"")===tid).map(x=>x.player_id),...DATA.rounds.filter(x=>String(x.tournament_id||"")===tid).map(x=>x.player_id)].filter(Boolean).map(String));
-    }
-    if(contextView==="results"||contextView==="rounds") return new Set(p?[p]:[]);
-    return new Set();
-  };
-  const pids=playerIdsFor(state.view,obj);
-  if(v==="players") return pids.size ? DATA.players.filter(x=>pids.has(String(x.player_id))) : [];
-  if(v==="clubs"){
-    if(state.view==="players") return DATA.clubs.filter(x=>String(x.club_id||"")===String(obj.current_club_id||""));
-    if(state.view==="associations") return DATA.clubs.filter(x=>String(x.association_id||"")===id);
-    if(pids.size) return DATA.clubs.filter(x=>[...pids].some(pid=>String(findById("players",pid)?.current_club_id||"")===String(x.club_id||"")));
-    if(cl) return DATA.clubs.filter(x=>String(x.club_id)===cl);
-    return [];
-  }
-  if(v==="associations"){
-    if(state.view==="players") return DATA.associations.filter(x=>String(x.association_id||"")===String(obj.current_association_id||""));
-    if(state.view==="clubs") return DATA.associations.filter(x=>String(x.association_id||"")===String(obj.association_id||""));
-    if(pids.size){
-      const aids=new Set([...pids].map(pid=>findById("players",pid)?.current_association_id).filter(Boolean).map(String));
-      return DATA.associations.filter(x=>aids.has(String(x.association_id)));
-    }
-    return [];
-  }
-  if(v==="tournaments"){
-    const tids=new Set();
-    if(state.view==="results"||state.view==="rounds"){ if(t) tids.add(t); }
-    else if(state.view==="players"){
-      DATA.results.filter(x=>String(x.player_id)===String(obj.player_id)).forEach(x=>x.tournament_id&&tids.add(String(x.tournament_id)));
-      DATA.rounds.filter(x=>String(x.player_id)===String(obj.player_id)).forEach(x=>x.tournament_id&&tids.add(String(x.tournament_id)));
-    } else if(state.view==="clubs"||state.view==="associations"){
-      const ids=playerIdsFor(state.view,obj);
-      DATA.results.filter(x=>ids.has(String(x.player_id))&&x.tournament_id).forEach(x=>tids.add(String(x.tournament_id)));
-      DATA.rounds.filter(x=>ids.has(String(x.player_id))&&x.tournament_id).forEach(x=>tids.add(String(x.tournament_id)));
-    }
-    return DATA.tournaments.filter(x=>tids.has(String(x.tournament_id)));
-  }
-  if(v==="results"){
-    if(state.view==="players") return DATA.results.filter(x=>String(x.player_id)===String(obj.player_id));
-    if(state.view==="tournaments") return DATA.results.filter(x=>String(x.tournament_id)===String(obj.tournament_id));
-    if(state.view==="rounds") return DATA.results.filter(x=>String(x.result_id)===String(obj.result_id));
-    if(state.view==="clubs"||state.view==="associations"){ const ids=playerIdsFor(state.view,obj); return DATA.results.filter(x=>ids.has(String(x.player_id))||String(x.club_id||"")===String(obj.club_id||"")); }
-    if(res) return DATA.results.filter(x=>String(x.result_id)===res);
-    return [];
-  }
-  if(v==="rounds"){
-    if(state.view==="players") return DATA.rounds.filter(x=>String(x.player_id)===String(obj.player_id));
-    if(state.view==="results") return DATA.rounds.filter(x=>String(x.result_id)===String(obj.result_id));
-    if(state.view==="tournaments") return DATA.rounds.filter(x=>String(x.tournament_id)===String(obj.tournament_id));
-    if(state.view==="clubs"||state.view==="associations"){ const ids=playerIdsFor(state.view,obj); return DATA.rounds.filter(x=>ids.has(String(x.player_id))); }
-    return [];
-  }
-  if(v==="drl"){
-    if(state.view==="players") return DATA.drl.filter(x=>String(x.player_id)===String(obj.player_id)||String(x.pass_number||"")===String(obj.pass_number||""));
-    if(pids.size) return DATA.drl.filter(x=>pids.has(String(x.player_id)));
-    return [];
-  }
-  if(v==="dmv"){
-    if(state.view==="players") return DATA.dmv.filter(x=>String(x.player_id)===String(obj.player_id)||String(x.pass_number||"")===String(obj.pass_number||""));
-    if(pids.size) return DATA.dmv.filter(x=>pids.has(String(x.player_id)));
-    return [];
-  }
-  return [];
+function renderStats(){const d=MANIFEST?.counts||{};const defs=[["players","Spieler"],["clubs","Vereine"],["associations","Verbände"],["tournaments","Turniere"],["results","Ergebnisse"],["rounds","Runden"],["drl","DRL"],["dmv","DMV"]];$("#stats").innerHTML=defs.map(([k,l])=>'<button class="stat" onclick="setView(\''+k+'\')"><b>'+Number(d[k]||0).toLocaleString("de-DE")+'</b><span>'+l+'</span></button>').join("")}
+function renderStatus(ok=true,msg=""){const c=MANIFEST?.counts||{};$("#drl-status").innerHTML='<div class="drl-status ok"><b>Datenbank:</b> '+(ok?"Webindex aktiv":"Laden…")+' · '+Number(c.players||0).toLocaleString("de-DE")+' Spieler · '+Number(c.drl||0).toLocaleString("de-DE")+' DRL · '+Number(c.dmv||0).toLocaleString("de-DE")+' DMV</div>'+(msg?'<div class="drl-status warn"><b>Fehler:</b> '+esc(msg)+'</div>':"")}
+function rowsFor(v){return DATA[v]||[]}
+function renderTable(rows,view){
+  if(!rows.length){$("#tablewrap").innerHTML='<div class="empty">Keine Datensätze gefunden.</div>';return}
+  const cols=Object.keys(rows[0]).slice(0,8);
+  $("#tablewrap").innerHTML='<div class="tablebox"><table><thead><tr>'+cols.map(c=>'<th>'+esc(c)+'</th>').join("")+'</tr></thead><tbody>'+rows.slice(0,500).map(o=>'<tr>'+cols.map(c=>'<td>'+((["player_id","club_id","association_id","tournament_id","result_id","round_id"].includes(c)&&o[c])?link(c.replace("_id","")+"s",o[c],o[c]):esc(o[c]))+'</td>').join("")+'</tr>').join("")+'</tbody></table></div><div class="history-stat">'+rows.length.toLocaleString("de-DE")+' Treffer · Anzeige maximal 500</div>'
 }
-
-function renderStats(){const defs=[["players","Spieler"],["clubs","Vereine"],["associations","Verbände"],["tournaments","Turniere"],["results","Ergebnisse"],["rounds","Runden"],["drl","DRL"],["dmv","DMV"]];$("#stats").innerHTML=defs.map(([k,l])=>'<button class="stat" onclick="setView(\''+k+'\')"><b>'+DATA[k].length.toLocaleString("de-DE")+'</b><span>'+l+'</span></button>').join("")}
-function renderStatus(){
-  const d=DRL_STATUS,m=DMV_STATUS;
-  const errors=DATA_ERRORS.length?'<div class="drl-status warn"><b>Ladefehler:</b> '+esc(DATA_ERRORS.slice(0,4).join(" · "))+'</div>':"";
-  $("#drl-status").innerHTML=errors
-    +'<div class="drl-status '+(d.loaded&&d.rows===d.expected?"ok":"warn")+'"><b>DRL:</b> '+d.rows.toLocaleString("de-DE")+' / 213.155 · '+d.shards+'/8 Shards</div>'
-    +'<div class="drl-status '+(m.loaded&&m.rows===m.expected?"ok":"warn")+'"><b>DMV:</b> '+m.rows.toLocaleString("de-DE")+' / 156.744 · '+m.shards+'/16 Shards</div>';
+function filterRows(rows){const q=norm(state.q);return !q?rows:rows.filter(o=>Object.values(o).some(v=>norm(v).includes(q)))}
+function renderCoverage(){const c=MANIFEST?.counts||{};$("#relation-coverage").innerHTML='<div class="coverage-card"><span>Architektur</span><b>Index + On-Demand</b><small>iPhone-optimiert</small></div><div class="coverage-card"><span>Quellen</span><b>Geprüfte Masterdaten</b><small>Keine Voll-Ladung beim Start</small></div><div class="coverage-card"><span>DRL</span><b>'+Number(c.drl||0).toLocaleString("de-DE")+'</b><small>kanonische Shards</small></div><div class="coverage-card"><span>DMV</span><b>'+Number(c.dmv||0).toLocaleString("de-DE")+'</b><small>16 öffentliche Shards</small></div>'}
+async function loadBase(){
+  MANIFEST=await getJSON(WEB+"manifest.json");
+  [DATA.players,DATA.clubs,DATA.associations,DATA.tournaments]=await Promise.all([
+    getJSON(WEB+"players-index.json"),getJSON(WEB+"clubs-index.json"),getJSON(WEB+"associations-index.json"),getJSON(WEB+"tournaments-index.json")
+  ]);
+  SEARCH=await getJSON(WEB+"search-index.json");
 }
-function renderCoverage(){const s=relationSummary(),rows=[["Spieler → Verein",s.playersClubs,DATA.players.length],["Spieler → Verband",s.playersAssociations,DATA.players.length],["Verein → Verband",s.clubAssociations,DATA.clubs.length],["Ergebnis → Spieler",s.resultPlayers,DATA.results.length],["Ergebnis → Turnier",s.resultTournaments,DATA.results.length],["Ergebnis → Verein",s.resultClubs,DATA.results.length],["Runde → Ergebnis",s.roundsResults,DATA.rounds.length],["Runde → Spieler",s.roundPlayers,DATA.rounds.length],["Runde → Turnier",s.roundTournaments,DATA.rounds.length],["DRL → Spieler",s.drlPlayers,DATA.drl.length],["DMV → Spieler",s.dmvPlayers,DATA.dmv.length]];$("#relation-coverage").innerHTML=rows.map(x=>'<div class="coverage-card"><span>'+esc(x[0])+'</span><b>'+x[1].toLocaleString("de-DE")+' / '+x[2].toLocaleString("de-DE")+'</b><small>'+((x[2]?x[1]/x[2]*100:100).toFixed(1))+' %</small></div>').join("")}
-function rowMatches(o){const q=norm(state.q);return !q||Object.values(o).some(v=>norm(v).includes(q))}
-function viewForField(c){return ({player_id:"players",club_id:"clubs",association_id:"associations",tournament_id:"tournaments",result_id:"results",round_id:"rounds",drl_entry_id:"drl",dmv_entry_id:"dmv"})[c]}
-function renderTable(rows){if(!rows.length){$("#tablewrap").innerHTML='<div class="empty">Keine Datensätze gefunden.</div>';return}const cols=Object.keys(rows[0]).slice(0,8);$("#tablewrap").innerHTML='<div class="tablebox"><table><thead><tr>'+cols.map(c=>'<th>'+esc(c)+'</th>').join("")+'</tr></thead><tbody>'+rows.slice(0,500).map(o=>'<tr>'+cols.map(c=>'<td>'+((viewForField(c)&&o[c])?link(viewForField(c),o[c],o[c]):esc(o[c]))+'</td>').join("")+'</tr>').join("")+'</tbody></table></div><div class="history-stat">'+rows.length.toLocaleString("de-DE")+' Treffer · Anzeige maximal 500</div>'}
-
-function playerHistory(p){const club=findById("clubs",p.current_club_id),assoc=findById("associations",p.current_association_id),res=DATA.results.filter(x=>String(x.player_id)===String(p.player_id)),rounds=DATA.rounds.filter(x=>String(x.player_id)===String(p.player_id)),drl=DATA.drl.filter(x=>String(x.player_id)===String(p.player_id)),dmv=DATA.dmv.filter(x=>String(x.player_id)===String(p.player_id)||String(x.pass_number||"")===String(p.pass_number||""));const tournaments=[...new Map(res.map(x=>{const t=findById("tournaments",x.tournament_id);return t?[t.tournament_id,t]:null}).filter(Boolean)).values()];return '<div class="history-section"><div class="history-title">Spielerprofil</div><div class="history-links"><b>Verein:</b> '+(club?link("clubs",club.club_id,club.canonical_name):"nicht zugeordnet")+' · <b>Verband:</b> '+(assoc?link("associations",assoc.association_id,assoc.association_name):"nicht zugeordnet")+'</div><div class="history-links"><b>Turniere:</b> '+tournaments.length.toLocaleString("de-DE")+' · <b>Ergebnisse:</b> '+res.length.toLocaleString("de-DE")+' · <b>Runden:</b> '+rounds.length.toLocaleString("de-DE")+' · <b>DRL:</b> '+drl.length.toLocaleString("de-DE")+' · <b>DMV:</b> '+dmv.length.toLocaleString("de-DE")+'</div>'+historyTable("Turniere",tournaments,"tournaments")+historyTable("Ergebnisse",res,"results")+historyTable("Runden",rounds,"rounds")+historyTable("DRL",drl.slice(0,300),"drl")+historyTable("DMV",dmv.slice(0,300),"dmv")+'</div>'}
-
-function historyTable(title,rows,view){if(!rows.length)return "";const cols=Object.keys(rows[0]).slice(0,7);return '<details open><summary>'+esc(title)+' ('+rows.length.toLocaleString("de-DE")+')</summary><div class="tablebox"><table><thead><tr>'+cols.map(c=>'<th>'+esc(c)+'</th>').join("")+'</tr></thead><tbody>'+rows.slice(0,100).map(o=>'<tr>'+cols.map(c=>'<td>'+((viewForField(c)&&o[c])?link(viewForField(c),o[c],o[c]):esc(o[c]))+'</td>').join("")+'</tr>').join("")+'</tbody></table></div></details>'}
-
-function renderDetail(){const o=findById(state.view,state.detail);if(!o){$("#detail").innerHTML='<div class="empty">Datensatz nicht gefunden.</div>';return}$("#detail").innerHTML='<div class="history-section"><div class="history-title">'+esc(label(o))+'</div><div class="detail-grid">'+Object.entries(o).map(([k,v])=>'<div><small>'+esc(k)+'</small><b>'+esc(v||"—")+'</b></div>').join("")+'</div></div>'+(state.view==="players"?playerHistory(o):'<div class="history-section"><div class="history-title">Verknüpfte Daten</div>'+["players","clubs","associations","tournaments","results","rounds","drl","dmv"].filter(v=>v!==state.view).map(v=>{const rr=relatedRows(v,o);return rr.length?'<details><summary>'+esc(v)+' ('+rr.length.toLocaleString("de-DE")+')</summary>'+historyTable("",rr.slice(0,100),v)+'</details>':""}).join("")+'</div>');$("#tablewrap").innerHTML=""}
-function renderIntegrity(){const h=relationHealth();return '<div class="history-section"><div class="history-title">Integritätsprüfung</div><div class="history-links"><b>'+h.linked.toLocaleString("de-DE")+'</b> verknüpfte Relationen · <b>'+h.open.toLocaleString("de-DE")+'</b> offene Relationen</div>'+h.checks.map(x=>'<div class="coverage-card"><span>'+esc(x[0])+'</span><b>'+x[1].toLocaleString("de-DE")+' / '+x[2].toLocaleString("de-DE")+'</b><small>'+((x[2]?x[1]/x[2]*100:100).toFixed(1))+' %</small></div>').join("")+'</div>'}
-function render(){const labels={players:"Spieler",clubs:"Vereine",tournaments:"Turniere",associations:"Verbände",results:"Ergebnisse",rounds:"Runden",drl:"DRL-Listen",dmv:"DMV-Daten"};$("#viewLabel").textContent=labels[state.view]||"Datenbank";$("#title").textContent=state.detail?"Detailansicht":$("#viewLabel").textContent+"übersicht";renderStats();renderStatus();renderCoverage();if(state.detail){renderDetail();return}const rows=(DATA[state.view]||[]).filter(rowMatches);$("#count").textContent=rows.length.toLocaleString("de-DE")+" Datensätze";if(state.view==="integrity"){$("#detail").innerHTML=renderIntegrity();$("#tablewrap").innerHTML="";return}$("#detail").innerHTML="";renderTable(rows)}
-$("#search").addEventListener("input",e=>{state.q=e.target.value;state.detail=null;render();renderSearchResults(e.target.value)});$("#clear").onclick=()=>{state.q="";$("#search").value="";state.detail=null;render();renderSearchResults("")};
-function renderSearchResults(q){const box=$("#search-results");if(!q){box.innerHTML="";return}const out=[];for(const v of ["players","clubs","tournaments","associations","results","rounds","drl","dmv"]){(DATA[v]||[]).filter(rowMatches).slice(0,5).forEach(o=>out.push('<button onclick="openItem(\''+v+'\',\''+esc(ident(o))+'\')">'+esc(label(o))+' <small>('+esc(v)+')</small></button>'))}box.innerHTML=out.join("")}
+function searchEntities(q){
+  const n=norm(q); if(!n)return [];
+  return SEARCH.filter(x=>norm(x.label+" "+x.keywords).includes(n)).slice(0,40);
+}
+async function loadCatalog(view){
+  const files=MANIFEST.catalog?.[view]||[];
+  const all=[];
+  for(const f of files){const part=await getJSON(WEB+"catalog/"+f);all.push(...part)}
+  return all;
+}
+async function playerDetail(id){
+  const b=String(id).match(/^\d+$/)?String(Math.floor(Number(id)/100)).padStart(4,"0"):"0000";
+  const x=await getJSON(WEB+"players/"+b+".json"); return x[String(id)]||null;
+}
+async function clubDetail(id){return getJSON(WEB+"clubs/"+id+".json")}
+async function associationDetail(id){return getJSON(WEB+"associations/"+id+".json")}
+function tourBucket(id){let n=0;for(let i=0;i<String(id).length;i++)n+=((i+1)*String(id).charCodeAt(i));return (n%256).toString(16).padStart(2,"0")}
+async function tournamentDetail(id){const x=await getJSON(WEB+"tournaments/"+tourBucket(id)+".json");return x[String(id)]||null}
+function historyTable(title,rows){
+  if(!rows?.length)return "";
+  const cols=Object.keys(rows[0]).slice(0,7);
+  return '<details open><summary>'+esc(title)+' ('+rows.length.toLocaleString("de-DE")+')</summary><div class="tablebox"><table><thead><tr>'+cols.map(c=>'<th>'+esc(c)+'</th>').join("")+'</tr></thead><tbody>'+rows.slice(0,100).map(o=>'<tr>'+cols.map(c=>'<td>'+esc(o[c])+'</td>').join("")+'</tr>').join("")+'</tbody></table></div></details>'
+}
+async function renderDetail(){
+  const v=state.view,id=state.detail;
+  let d=null;
+  if(v==="players")d=await playerDetail(id);
+  else if(v==="clubs")d=await clubDetail(id);
+  else if(v==="associations")d=await associationDetail(id);
+  else if(v==="tournaments")d=await tournamentDetail(id);
+  if(!d){$("#detail").innerHTML='<div class="empty">Datensatz nicht gefunden.</div>';return}
+  let title="",body="";
+  if(v==="players"){
+    const p=d.player; title=p.name;
+    body='<div class="history-links"><b>Verein:</b> '+esc(p.current_club_id||"—")+' · <b>Verband:</b> '+esc(p.current_association_id||"—")+' · <b>Passnummer:</b> '+esc(p.pass_number||"—")+'</div>'+
+      '<div class="history-links"><b>Ergebnisse:</b> '+d.results.length+' · <b>Runden:</b> '+d.rounds.length+' · <b>DRL:</b> '+d.drl.length+' · <b>DMV:</b> '+d.dmv.length+'</div>'+
+      historyTable("Ergebnisse",d.results)+historyTable("Runden",d.rounds)+historyTable("DRL",d.drl)+historyTable("DMV",d.dmv);
+  } else if(v==="clubs"){
+    title=d.club.canonical_name;
+    body='<div class="history-links"><b>Verband:</b> '+esc(d.club.association_id||"—")+' · <b>Spieler:</b> '+d.player_ids.length+'</div>'+
+      historyTable("Spieler",d.player_ids.map(id=>DATA.players.find(p=>String(p.player_id)===String(id))).filter(Boolean));
+  } else if(v==="associations"){
+    title=d.association.association_name;
+    body='<div class="history-links"><b>Spieler:</b> '+d.player_ids.length+' · <b>Vereine:</b> '+d.club_ids.length+'</div>'+
+      historyTable("Vereine",d.club_ids.map(id=>DATA.clubs.find(c=>String(c.club_id)===String(id))).filter(Boolean));
+  } else {
+    title=d.tournament.tournament_name;
+    body='<div class="history-links"><b>Datum:</b> '+esc(d.tournament.date||"—")+' · <b>Ort:</b> '+esc(d.tournament.location||"—")+' · <b>Ergebnisse:</b> '+d.result_ids.length+' · <b>Runden:</b> '+d.round_ids.length+'</div>'+
+      '<div class="history-links">Die zugehörigen Ergebnisse und Runden werden bei Bedarf aus den Katalogen geladen.</div>';
+  }
+  $("#detail").innerHTML='<div class="history-section"><div class="history-title">'+esc(title)+'</div>'+body+'</div>';
+  $("#tablewrap").innerHTML="";
+}
+async function render(){
+  if(!MANIFEST){$("#title").textContent="Datenbank wird geladen…";return}
+  const labels={players:"Spieler",clubs:"Vereine",tournaments:"Turniere",associations:"Verbände",results:"Ergebnisse",rounds:"Runden",drl:"DRL-Listen",dmv:"DMV-Daten"};
+  $("#viewLabel").textContent=labels[state.view]||"Datenbank";$("#title").textContent=state.detail?"Detailansicht":labels[state.view]+"übersicht";
+  renderStats();renderStatus();renderCoverage();
+  if(state.detail){try{await renderDetail()}catch(e){renderStatus(false,e.message);$("#detail").innerHTML='<div class="empty">Daten konnten nicht geladen werden.</div>'}return}
+  let rows=rowsFor(state.view);
+  if(["results","rounds","drl","dmv"].includes(state.view)){
+    if(!DATA[state.view].length)DATA[state.view]=await loadCatalog(state.view);
+    rows=DATA[state.view];
+  }
+  rows=filterRows(rows);$("#count").textContent=rows.length.toLocaleString("de-DE")+" Datensätze";$("#detail").innerHTML="";renderTable(rows,state.view);
+}
+function renderSearchResults(q){
+  const box=$("#search-results"); if(!q){box.innerHTML="";return}
+  box.innerHTML=searchEntities(q).map(x=>'<button onclick="openItem('+JSON.stringify(x.type)+','+JSON.stringify(x.id)+')">'+esc(x.label)+' <small>('+esc(x.type)+')</small></button>').join("")
+}
+$("#search").addEventListener("input",e=>{state.q=e.target.value;state.detail=null;render();renderSearchResults(e.target.value)});
+$("#clear").onclick=()=>{state.q="";$("#search").value="";state.detail=null;render();renderSearchResults("")};
 document.querySelectorAll("[data-view]").forEach(b=>b.onclick=()=>setView(b.dataset.view));
 $("#themeBtn").onclick=()=>document.body.classList.toggle("light");
-(async()=>{for(const [k,u] of Object.entries(SOURCES))await loadCSV(k,u);rebuildIndexes();render();await loadDRL();rebuildIndexes();render();await loadDMV();rebuildIndexes();render()})().catch(e=>{console.error("Datenbank-Startfehler",e);rebuildIndexes();render()});
+(async()=>{try{await loadBase();render()}catch(e){renderStatus(false,e.message);$("#title").textContent="Datenbank konnte nicht geladen werden";$("#detail").innerHTML='<div class="empty">Die Webdaten sind noch nicht veröffentlicht oder konnten nicht geladen werden.</div>'}})();
