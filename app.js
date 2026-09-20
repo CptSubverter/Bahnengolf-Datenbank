@@ -29,7 +29,7 @@ const FIELD_LABELS={
   year:"Jahr",category:"Kategorie",rating_value:"Wertung",source:"Quelle",
   dmv_entry_id:"DMV-Eintrag",drl_entry_id:"DRL-Eintrag"
 };
-const HIDDEN_FIELDS=new Set(["player_id","club_id","association_id","tournament_id","result_id","round_id","drl_entry_id","dmv_entry_id","normalized_name","source_code"]);
+const HIDDEN_FIELDS=new Set(["player_id","club_id","association_id","tournament_id","result_id","round_id","drl_entry_id","dmv_entry_id","normalized_name","source_code","identity_status"]);
 const TYPE_BY_ID={player_id:"players",club_id:"clubs",association_id:"associations",tournament_id:"tournaments",result_id:"results",round_id:"rounds",drl_entry_id:"drl",dmv_entry_id:"dmv"};
 function entityName(type,id){
   if(!id)return "";
@@ -56,7 +56,6 @@ function displayColumns(rows,view){
   if(!rows.length)return [];
   const all=Object.keys(rows[0]);
   const hidden=new Set(HIDDEN_FIELDS);
-  if(view==="players")hidden.add("identity_status");
   const visible=all.filter(c=>!hidden.has(c));
   const preferred=["name","canonical_name","player_name","tournament_name","association_name","pass_number","date","location","category","place","score","rating_value","identity_status"];
   return [...preferred.filter(c=>visible.includes(c)),...visible.filter(c=>!preferred.includes(c))].slice(0,8);
