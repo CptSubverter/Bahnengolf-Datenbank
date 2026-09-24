@@ -163,7 +163,9 @@ function renderSearchResults(q){
   box.innerHTML='<div class="search-results-title">'+hits.length.toLocaleString("de-DE")+' Suchergebnisse</div>'+
     (hits.length?hits.map(x=>{
       const v=map[x.type]||x.type;
-      return '<button type="button" class="search-hit" data-open-type="'+esc(v)+'" data-open-id="'+esc(String(x.id))+'"><span>'+esc(x.label)+'</span><small>'+esc(x.type==="player"?"Spieler":x.type==="club"?"Verein":x.type==="association"?"Verband":"Turnier")+'</small></button>'
+      const id=String(x.id);
+      const typeLabel=x.type==="player"?"Spieler":x.type==="club"?"Verein":x.type==="association"?"Verband":"Turnier";
+      return '<button type="button" class="search-hit" data-open-type="'+esc(v)+'" data-open-id="'+esc(id)+'" onclick="openItem(\''+esc(v)+'\',\''+esc(id)+'\');return false;"><span>'+esc(x.label)+'</span><small>'+esc(typeLabel)+'</small></button>';
     }).join(""):'<div class="search-empty">Keine passenden Datensätze gefunden.</div>');
   box.classList.add("open");
 }
